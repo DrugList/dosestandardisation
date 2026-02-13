@@ -160,13 +160,13 @@
     
     const SHEET_CONFIG = {
         injection: {
-            gid: '0', // First tab usually GID 0
+            gid: '0', 
             title: 'Injection',
             container: '#table-container-injection',
             loading: '#loading-injection'
         },
         oral: {
-            gid: '1948005281', // YOUR ORAL GID
+            gid: '1948005281', 
             title: 'Oral',
             container: '#table-container-oral',
             loading: '#loading-oral'
@@ -175,11 +175,54 @@
 
     let tables = {}; 
 
+    // --- HELPER: FIX TABLE STRUCTURE ---
+    // This fixes the "Incorrect column count" error caused by merged cells
+    function normalizeTable(table) {
+        // 1. Remove Colspan/Rowspan (Merged Cells) - DataTables cannot handle these
+        $(table).find('td, th').removeAttr('colspan rowspan');
+
+        // 2. Calculate the maximum number of columns in the table
+        let maxCols = 0;
+        $(table).find('tr').each(function() {
+            let cols = $(this).find('td, th').length;
+            if (cols > maxCols) maxCols = cols;
+        });
+
+        // 3. Pad rows to ensure every row has exactly 'maxCols' columns
+        $(table).find('tr').each(function() {
+            let row = $(this);
+            let count = row.find('td, th').length;
+            let diff = maxCols - count;
+            for(let i=0; i<diff; i++) {
+                row.append('<td></td>'); // Add empty cells
+            }
+        });
+
+        // 4. Ensure THEAD exists
+        // Google HTML might not put the header in <thead>
+        if ($(table).find('thead').length === 0) {
+            // Move first row to thead
+            const firstRow = $(table).find('tr:first');
+            $(table).prepend('<thead></thead>');
+            $(table).find('thead').append(firstRow);
+            // Convert tds to ths
+            $(table).find('thead td').each(function() {
+                $(this).replaceWith('<th>' + $(this).html() + '</th>');
+            });
+        }
+        
+        // 5. Ensure TBOBY exists
+        if ($(table).find('tbody').length === 0) {
+            $(table).append('<tbody></tbody>');
+            $(table).find('tr').not('thead tr').appendTo($(table).find('tbody'));
+        }
+    }
+
     async function fetchSheetAsHTML(sheetKey) {
         const config = SHEET_CONFIG[sheetKey];
         const loadingEl = document.querySelector(config.loading);
         
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${config.gid}&tqx=out:html&headers=1&t=${new Date().getTime()}`;
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${config.gid}&tqx=out:html&headers=0&t=${new Date().getTime()}`;
         
         loadingEl.innerHTML = "Loading data...";
         loadingEl.className = "status-box";
@@ -195,6 +238,10 @@
                     
                     if (!rawTable) throw new Error("No table found");
 
+                    // FIX THE TABLE STRUCTURE BEFORE INITIALIZING
+                    normalizeTable(rawTable);
+
+                    // Cleanup styles
                     rawTable.removeAttribute('style');
                     rawTable.querySelectorAll('td, th').forEach(el => {
                         el.removeAttribute('style');
