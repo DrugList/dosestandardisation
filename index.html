@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medication Database</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f4f9; }
+
+        /* --- STICKY HEADER SYSTEM --- */
+        .app-header {
+            background-color: #d32f2f;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1100; 
+        }
+        
+        .app-header h1 { margin: 0; font-size: clamp(18px, 4vw, 24px); letter-spacing: 1px; }
+
+        /* Control Row */
+        .sticky-controls {
+            position: sticky;
+            top: 60px; 
+            z-index: 1000;
+            background-color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .search-wrapper { flex-grow: 1; min-width: 250px; }
+        .custom-search-input {
+            width: 100%; padding: 12px 20px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px;
+            box-sizing: border-box; transition: border-color 0.3s;
+        }
+        .custom-search-input:focus { border-color: #d32f2f; outline: none; }
+
+        /* Buttons */
+        .header-btn {
+            background-color: white; color: #d32f2f; padding: 10px 16px; border-radius: 4px;
+            text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex;
+            align-items: center; gap: 5px; transition: all 0.2s; border: 2px solid #d32f2f; cursor: pointer;
+        }
+        .header-btn:hover { background-color: #fff5f5; }
+        #refreshBtn { background-color: #2196f3; color: white; border-color: #2196f3; }
+        #refreshBtn:hover { background-color: #1976d2; }
+
+        /* Section Styling */
+        .section-title {
+            margin-top: 30px; margin-bottom: 10px; padding-bottom: 5px;
+            border-bottom: 2px solid #ddd; color: #333; font-size: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .material-icons { color: #d32f2f; }
+
+        /* Table Styling */
+        .dataTables_wrapper { overflow-x: auto; }
+        
+        table.dataTable {
+            width: 100% !important; 
+            border-collapse: collapse;
+        }
+
+        table.dataTable thead th { 
+            background-color: #1976d2; 
+            color: white; 
+            padding: 12px 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            border: 1px solid #1666b8;
+            text-align: left;
+        }
+
+        table.dataTable tbody td { 
+            padding: 12px 10px; 
+            border: 1px solid #e0e0e0; 
+            vertical-align: top;
+            background-color: #fff;
+        }
+        
+        /* IMPORTANT: Preserve Bold from Google Sheets */
+        table.dataTable tbody td { font-weight: normal; color: #333; }
+        table.dataTable tbody td b, table.dataTable tbody td strong { 
+            font-weight: 700 !important; 
+            color: #000 !important;
+        }
+
+        /* Loading & Error */
+        .status-box { text-align: center; padding: 20px; color: #666; background: #f9f9f9; border-radius: 4px; margin-bottom: 20px;}
+        .error-msg { color: #d32f2f; border: 1px solid #ef9a9a; background: #ffebee; }
+        
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .sticky-controls { top: 55px; padding: 10px 15px; }
+            .header-btn { padding: 8px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <h1>DRUG FORMULARY DATABASE</h1>
+</div>
+
+<div class="sticky-controls">
+    <div class="search-wrapper">
+        <input type="text" id="globalSearch" class="custom-search-input" placeholder="Search Injection & Oral...">
+    </div>
+
+    <button id="refreshBtn" onclick="forceRefresh()" class="header-btn">
+        <span class="material-icons" style="font-size: 18px;">refresh</span>
+        Refresh
+    </button>
+
+    <a id="downloadLink" href="https://docs.google.com/spreadsheets/d/1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ/edit?usp=sharing" target="_blank" class="header-btn">
+        <span class="material-icons" style="font-size: 18px;">download</span>
+        Muat Turun
+    </a>
+</div>
+
+<div class="container">
+    <!-- Section 1: Injection -->
+    <div class="section-title">
+        <span class="material-icons">vaccines</span>
+        INJECTION
+    </div>
+    <div id="loading-injection" class="status-box">Connecting...</div>
+    <div id="table-container-injection"></div>
+
+    <!-- Section 2: Oral -->
+    <div class="section-title">
+        <span class="material-icons">medication</span>
+        ORAL
+    </div>
+    <div id="loading-oral" class="status-box">Waiting...</div>
+    <div id="table-container-oral"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+    // --- CONFIGURATION ---
+    const SHEET_ID = '1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ';
+    
+    const SHEET_CONFIG = {
+        injection: {
+            gid: '0', // First tab usually GID 0
+            title: 'Injection',
+            container: '#table-container-injection',
+            loading: '#loading-injection'
+        },
+        oral: {
+            gid: '1948005281', // YOUR ORAL GID
+            title: 'Oral',
+            container: '#table-container-oral',
+            loading: '#loading-oral'
+        }
+    };
+
+    let tables = {}; 
+
+    async function fetchSheetAsHTML(sheetKey) {
+        const config = SHEET_CONFIG[sheetKey];
+        const loadingEl = document.querySelector(config.loading);
+        
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${config.gid}&tqx=out:html&headers=1&t=${new Date().getTime()}`;
+        
+        loadingEl.innerHTML = "Loading data...";
+        loadingEl.className = "status-box";
+
+        try {
+            $.ajax({
+                url: url,
+                dataType: 'html',
+                success: function(data) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data;
+                    const rawTable = tempDiv.querySelector('table');
+                    
+                    if (!rawTable) throw new Error("No table found");
+
+                    rawTable.removeAttribute('style');
+                    rawTable.querySelectorAll('td, th').forEach(el => {
+                        el.removeAttribute('style');
+                        el.removeAttribute('class');
+                    });
+
+                    const container = document.querySelector(config.container);
+                    container.innerHTML = '';
+                    container.appendChild(rawTable);
+
+                    if ($.fn.dataTable.isDataTable(rawTable)) {
+                        $(rawTable).DataTable().clear().destroy();
+                    }
+
+                    tables[sheetKey] = $(rawTable).DataTable({
+                        dom: 't',
+                        paging: false,
+                        info: false,
+                        ordering: true,
+                        searching: true,
+                        initComplete: function() {
+                            loadingEl.style.display = 'none';
+                        }
+                    });
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    throw new Error("Network Error");
+                }
+            });
+
+        } catch (error) {
+            console.error(`Error loading ${sheetKey}:`, error);
+            loadingEl.className = "status-box error-msg";
+            loadingEl.innerHTML = `<strong>Failed to load ${config.title}.</strong><br><small>Reason: ${error.message}</small>`;
+        }
+    }
+
+    $('#globalSearch').on('keyup', function() {
+        const val = $(this).val();
+        if (tables.injection) tables.injection.search(val).draw();
+        if (tables.oral) tables.oral.search(val).draw();
+    });
+
+    function forceRefresh() {
+        const icon = $('#refreshBtn .material-icons');
+        icon.addClass('spin');
+        
+        Object.values(SHEET_CONFIG).forEach(c => {
+            document.querySelector(c.loading).style.display = 'block';
+            document.querySelector(c.loading).className = 'status-box';
+            document.querySelector(c.loading).innerText = 'Refreshing...';
+            document.querySelector(c.container).innerHTML = '';
+        });
+
+        loadAllData();
+    }
+
+    function loadAllData() {
+        fetchSheetAsHTML('injection');
+        fetchSheetAsHTML('oral');
+        setTimeout(() => $('#refreshBtn .material-icons').removeClass('spin'), 1000);
+    }
+
+    $(document).ready(function() {
+        loadAllData();
+    });
+</script>
+</body>
+</html>
