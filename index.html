@@ -36,7 +36,6 @@
             min-height: 100vh;
         }
 
-        /* Background atmosphere */
         body::before {
             content: '';
             position: fixed;
@@ -51,7 +50,6 @@
             z-index: 0;
         }
 
-        /* Header */
         .app-header {
             background: linear-gradient(180deg, var(--header-bg) 0%, rgba(15, 23, 42, 0.95) 100%);
             backdrop-filter: blur(12px);
@@ -91,6 +89,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 16px var(--accent-glow);
+            flex-shrink: 0;
         }
 
         .logo-icon .material-icons {
@@ -119,6 +118,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -133,6 +133,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -171,7 +172,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Tabs */
         .tabs-wrapper {
             display: flex;
             gap: 4px;
@@ -223,7 +223,6 @@
             background: var(--border);
         }
 
-        /* Main Container */
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -232,7 +231,6 @@
             z-index: 1;
         }
 
-        /* Definition Box */
         .definition-box {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
             border: 1px solid rgba(16, 185, 129, 0.3);
@@ -266,7 +264,6 @@
             color: var(--fg);
         }
 
-        /* Search Bar */
         .search-container {
             margin-bottom: 20px;
         }
@@ -307,7 +304,6 @@
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        /* Loading State */
         .loading-state {
             text-align: center;
             padding: 60px 20px;
@@ -329,7 +325,7 @@
             margin: 0;
         }
 
-        /* Table Container */
+        /* FIXED: Table container now allows horizontal scroll */
         .table-container {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -338,10 +334,60 @@
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
         }
 
-        /* DataTable Overrides */
+        /* NEW: Scrollable wrapper for the table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--bg);
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: var(--bg);
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Scroll hint for mobile */
+        .scroll-hint {
+            display: none;
+            padding: 12px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--fg-muted);
+            text-align: center;
+        }
+
+        .scroll-hint .material-icons {
+            font-size: 16px;
+            vertical-align: middle;
+            margin-right: 6px;
+            animation: swipeHint 1.5s ease-in-out infinite;
+        }
+
+        @keyframes swipeHint {
+            0%, 100% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+        }
+
         #dataTable {
             width: 100% !important;
             border-collapse: collapse !important;
+            min-width: 800px;
         }
 
         #dataTable thead {
@@ -379,17 +425,15 @@
             background: rgba(16, 185, 129, 0.05);
         }
 
-        #DataTable tbody tr:last-child td {
+        #dataTable tbody tr:last-child td {
             border-bottom: none;
         }
 
-        /* First column (Nama Ubat) */
         #dataTable td:first-child {
             font-weight: 600;
             color: var(--accent);
         }
 
-        /* Image styling */
         .table-img {
             width: 72px;
             height: 72px;
@@ -417,13 +461,11 @@
             color: var(--danger);
         }
 
-        /* Bold text highlighting */
         .bold-text {
             font-weight: 700;
             color: var(--fg);
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -491,7 +533,6 @@
             transform: rotate(90deg);
         }
 
-        /* Error state */
         .error-state {
             text-align: center;
             padding: 60px 20px;
@@ -518,7 +559,6 @@
             font-size: 14px;
         }
 
-        /* DataTables no-results */
         .dataTables_empty {
             text-align: center;
             padding: 40px 20px;
@@ -541,6 +581,11 @@
             .header-actions {
                 width: 100%;
                 justify-content: flex-start;
+            }
+
+            .btn {
+                padding: 8px 14px;
+                font-size: 13px;
             }
 
             .tabs-wrapper {
@@ -571,9 +616,13 @@
                 width: 56px;
                 height: 56px;
             }
+
+            /* Show scroll hint on mobile */
+            .scroll-hint {
+                display: block;
+            }
         }
 
-        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -643,10 +692,18 @@
     </div>
 
     <div class="table-container">
-        <table id="dataTable">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
+        <!-- NEW: Scroll hint for mobile users -->
+        <div class="scroll-hint">
+            <span class="material-icons">swipe</span>
+            Scroll left/right to see more columns
+        </div>
+        <!-- NEW: Wrapper for horizontal scrolling -->
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -678,7 +735,7 @@
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v10_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v11_';
     
     // State
     let currentTab = 'injection';
@@ -702,7 +759,6 @@
         let url = rawUrl.trim();
         let id = null;
 
-        // Extract Google Drive ID
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (match) id = match[1];
         if (!id) {
@@ -729,29 +785,23 @@
         return url;
     }
 
-    // Parse bold formatting: **text**, <b>text</b>, <strong>text</strong>
     function parseBoldText(text) {
         if (!text) return '';
         let result = text.toString();
         
-        // Escape HTML first (but preserve intentional tags)
         result = result
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
         
-        // Restore intentional HTML bold tags
         result = result
             .replace(/&lt;b&gt;/gi, '<b>')
             .replace(/&lt;\/b&gt;/gi, '</b>')
             .replace(/&lt;strong&gt;/gi, '<strong>')
             .replace(/&lt;\/strong&gt;/gi, '</strong>');
         
-        // Convert markdown-style bold: **text** -> <b>text</b>
         result = result.replace(/\*\*([^*]+)\*\*/g, '<b class="bold-text">$1</b>');
-        
-        // Convert single asterisk emphasis: *text* -> <em>text</em>
         result = result.replace(/\*([^*]+)\*/g, '<em>$1</em>');
         
         return result;
@@ -766,13 +816,11 @@
         const cacheKey = CACHE_KEY_PREFIX + tabKey;
         const now = new Date().getTime();
         
-        // Check cache
         if (!force) {
             const cachedRaw = localStorage.getItem(cacheKey);
             if (cachedRaw) {
                 try {
                     const cached = JSON.parse(cachedRaw);
-                    // Cache valid for 5 minutes
                     if (cached.timestamp && (now - cached.timestamp < 300000)) {
                         return cached.data;
                     }
@@ -796,7 +844,6 @@
             
             const data = result.data;
             
-            // Save to cache
             localStorage.setItem(cacheKey, JSON.stringify({
                 timestamp: now,
                 data: data
@@ -806,7 +853,6 @@
         } catch (error) {
             console.error(`Error fetching ${tabKey}:`, error);
             
-            // Return cached data if available, even if expired
             const cachedRaw = localStorage.getItem(cacheKey);
             if (cachedRaw) {
                 try {
@@ -831,7 +877,6 @@
         errorState.style.display = 'none';
 
         try {
-            // Fetch both tabs in parallel
             const [injectionData, oralData] = await Promise.all([
                 fetchTabData('injection', forceRefresh),
                 fetchTabData('oral', forceRefresh)
@@ -840,7 +885,6 @@
             allData.injection = injectionData;
             allData.oral = oralData;
 
-            // Update counts
             document.getElementById('injection-count').textContent = 
                 injectionData ? injectionData.length : '0';
             document.getElementById('oral-count').textContent = 
@@ -848,7 +892,6 @@
 
             loadingState.style.display = 'none';
             
-            // Render current tab
             renderTable(currentTab);
 
         } catch (error) {
@@ -874,13 +917,11 @@
 
         const firstRow = data[0];
 
-        // Update page title
         const titleEl = document.getElementById('pageTitle');
         const dateEl = document.getElementById('pageDate');
         const definitionEl = document.getElementById('pageDefinition');
         const pdfBtn = document.getElementById('pdfButton');
 
-        // Title
         if (firstRow['CONFIG_TITLE']) {
             titleEl.textContent = firstRow['CONFIG_TITLE'];
             document.title = firstRow['CONFIG_TITLE'];
@@ -889,14 +930,12 @@
             document.title = `${TABS_CONFIG[tabKey].name} Medications`;
         }
 
-        // Date
         if (firstRow['CONFIG_DATE']) {
             dateEl.textContent = firstRow['CONFIG_DATE'];
         } else {
             dateEl.textContent = '';
         }
 
-        // Definition
         if (firstRow['CONFIG_DEFINITION']) {
             definitionEl.innerHTML = `<p>${parseBoldText(firstRow['CONFIG_DEFINITION'])}</p>`;
             definitionEl.classList.add('visible');
@@ -904,7 +943,6 @@
             definitionEl.classList.remove('visible');
         }
 
-        // PDF Link
         if (firstRow['CONFIG_PDF']) {
             const pdfUrl = getPdfViewUrl(firstRow['CONFIG_PDF']);
             if (pdfUrl) {
@@ -917,17 +955,14 @@
             pdfBtn.style.display = 'none';
         }
 
-        // Filter columns (exclude CONFIG columns)
         const allHeaders = Object.keys(firstRow);
         const tableHeaders = allHeaders.filter(h => !CONFIG_COLUMNS.includes(h));
 
-        // Destroy existing table
         if (dataTableInstance) {
             dataTableInstance.clear().destroy();
             $('#dataTable').empty();
         }
 
-        // Build table HTML
         let tableHtml = '<thead><tr>';
         tableHeaders.forEach(h => {
             tableHtml += `<th>${h}</th>`;
@@ -935,7 +970,6 @@
         tableHtml += '</tr></thead><tbody></tbody>';
         $('#dataTable').html(tableHtml);
 
-        // Column config
         const columnsConfig = tableHeaders.map(key => {
             return {
                 data: key,
@@ -944,24 +978,20 @@
                     
                     const rawVal = data.toString();
                     
-                    // Check for image URL
                     const imgUrl = getImageUrl(rawVal);
                     if (imgUrl) {
                         return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'img-error\\'>Image Error</span>'" alt="Medication Image">`;
                     }
                     
-                    // Check for "no image" placeholder
                     if (rawVal.toLowerCase() === 'no image') {
                         return '<span class="no-image">No Image</span>';
                     }
                     
-                    // Parse bold text
                     return parseBoldText(rawVal);
                 }
             };
         });
 
-        // Initialize DataTable
         dataTableInstance = $('#dataTable').DataTable({
             data: data,
             columns: columnsConfig,
@@ -976,7 +1006,6 @@
                 zeroRecords: 'No matching medications found'
             },
             initComplete: function() {
-                // Re-apply search
                 const currentSearch = $('#customSearch').val();
                 if (currentSearch) {
                     this.api().search(currentSearch).draw();
@@ -992,14 +1021,12 @@
     function switchTab(tabKey) {
         if (tabKey === currentTab) return;
 
-        // Update tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabKey);
         });
 
         currentTab = tabKey;
 
-        // Render the new table
         if (allData[tabKey]) {
             renderTable(tabKey);
         } else {
@@ -1012,11 +1039,9 @@
     // =============================================
     
     function forceRefresh() {
-        // Clear all cache for current tab
         const cacheKey = CACHE_KEY_PREFIX + currentTab;
         localStorage.removeItem(cacheKey);
         
-        // Reload
         loadAllData(true);
     }
 
@@ -1032,7 +1057,6 @@
         modal.classList.remove('active');
     }
 
-    // Keyboard close for modal
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
@@ -1044,17 +1068,14 @@
     // =============================================
     
     $(document).ready(function() {
-        // Load data
         loadAllData();
 
-        // Search handler
         $('#customSearch').on('keyup clear', function() {
             if (dataTableInstance) {
                 dataTableInstance.search($(this).val()).draw();
             }
         });
 
-        // Auto-refresh every 5 minutes
         setInterval(() => {
             loadAllData(false);
         }, 300000);
