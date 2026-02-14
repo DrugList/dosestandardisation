@@ -1045,6 +1045,10 @@
                     Oral
                     <span class="badge" id="oral-count">-</span>
                 </button>
+                <button class="tab-btn" data-tab="ivToOral" onclick="switchTab('ivToOral')">
+                    IV to Oral
+                    <span class="badge" id="ivToOral-count">-</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1111,18 +1115,19 @@
     
     const TABS_CONFIG = {
         injection: { gid: '0', name: 'Injection' },
-        oral: { gid: '1948005281', name: 'Oral' }
+        oral: { gid: '1948005281', name: 'Oral' },
+        ivToOral: { gid: '816449873', name: 'IV to Oral' }
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v15_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v16_';
     const FAVORITES_KEY = 'medApp_favorites';
     const THEME_KEY = 'medApp_theme';
     
     let currentTab = 'injection';
     let currentView = 'table';
     let dataTableInstance = null;
-    let allData = { injection: null, oral: null };
+    let allData = { injection: null, oral: null, ivToOral: null };
     let favorites = new Set();
     let showFavoritesOnly = false;
     let lastRefreshTime = null;
@@ -1351,17 +1356,20 @@
         cardsContainer.style.display = 'none';
 
         try {
-            const [injectionData, oralData] = await Promise.all([
+            const [injectionData, oralData, ivToOralData] = await Promise.all([
                 fetchTabData('injection', forceRefresh),
-                fetchTabData('oral', forceRefresh)
+                fetchTabData('oral', forceRefresh),
+                fetchTabData('ivToOral', forceRefresh)
             ]);
 
             allData.injection = injectionData;
             allData.oral = oralData;
+            allData.ivToOral = ivToOralData;
             lastRefreshTime = Date.now();
 
             document.getElementById('injection-count').textContent = injectionData ? injectionData.length : '0';
             document.getElementById('oral-count').textContent = oralData ? oralData.length : '0';
+            document.getElementById('ivToOral-count').textContent = ivToOralData ? ivToOralData.length : '0';
 
             loadingState.style.display = 'none';
             
