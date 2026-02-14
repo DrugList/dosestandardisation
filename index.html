@@ -75,7 +75,6 @@
                 radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
         }
 
-        /* Pull to refresh indicator */
         .pull-indicator {
             position: fixed;
             top: 0;
@@ -577,7 +576,6 @@
             color: var(--accent);
         }
 
-        /* Favorite column */
         .fav-btn {
             background: none;
             border: none;
@@ -634,16 +632,11 @@
             color: var(--fg);
         }
 
-        /* Card View */
+        /* Card View Styles */
         .cards-container {
-            display: none;
+            display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 16px;
-            padding: 16px;
-        }
-
-        .cards-container.active {
-            display: grid;
         }
 
         .med-card {
@@ -739,7 +732,6 @@
             line-height: 1.5;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -834,144 +826,65 @@
             font-size: 15px;
         }
 
-        /* Print Styles */
         @media print {
             body {
                 background: white !important;
                 color: black !important;
             }
-
-            body::before {
-                display: none;
-            }
-
+            body::before { display: none; }
             .app-header {
                 position: relative;
                 background: white !important;
                 box-shadow: none;
                 border-bottom: 2px solid black;
             }
-
-            .header-actions,
-            .tabs-wrapper,
-            .search-container,
-            .view-toggles,
-            .fav-btn,
-            .btn {
+            .header-actions, .tabs-wrapper, .search-container, .view-toggles, .fav-btn, .btn {
                 display: none !important;
             }
-
-            .main-container {
-                padding: 0;
-                max-width: none;
-            }
-
+            .main-container { padding: 0; max-width: none; }
             .table-container {
                 border: 1px solid #ccc;
                 border-radius: 0;
                 box-shadow: none;
             }
-
-            .scroll-hint {
-                display: none !important;
-            }
-
-            .table-wrapper {
-                overflow: visible;
-            }
-
-            #dataTable {
-                min-width: auto;
-            }
-
-            #dataTable th,
-            #dataTable td {
+            .scroll-hint { display: none !important; }
+            .table-wrapper { overflow: visible; }
+            #dataTable { min-width: auto; }
+            #dataTable th, #dataTable td {
                 border: 1px solid #ccc;
                 padding: 8px;
                 color: black;
             }
-
-            #dataTable th {
-                background: #f0f0f0 !important;
-            }
-
-            .table-img {
-                width: 50px;
-                height: 50px;
-            }
+            #dataTable th { background: #f0f0f0 !important; }
+            .table-img { width: 50px; height: 50px; }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .header-inner {
-                padding: 12px 16px;
-            }
-
+            .header-inner { padding: 12px 16px; }
             .header-top {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
             }
-
             .header-actions {
                 width: 100%;
                 justify-content: flex-start;
             }
-
-            .btn {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-
-            .btn-icon {
-                padding: 8px;
-            }
-
-            .tabs-wrapper {
-                width: 100%;
-            }
-
-            .tab-btn {
-                flex: 1;
-                text-align: center;
-                padding: 12px 16px;
-            }
-
-            .main-container {
-                padding: 16px;
-            }
-
+            .btn { padding: 8px 12px; font-size: 13px; }
+            .btn-icon { padding: 8px; }
+            .tabs-wrapper { width: 100%; }
+            .tab-btn { flex: 1; text-align: center; padding: 12px 16px; }
+            .main-container { padding: 16px; }
             .controls-row {
                 flex-direction: column;
                 align-items: stretch;
             }
-
-            .search-wrapper {
-                max-width: none;
-            }
-
-            .view-toggles {
-                justify-content: center;
-            }
-
-            #dataTable th,
-            #dataTable td {
-                padding: 12px 10px;
-                font-size: 13px;
-            }
-
-            .table-img {
-                width: 56px;
-                height: 56px;
-            }
-
-            .scroll-hint {
-                display: block;
-            }
-
-            .cards-container {
-                grid-template-columns: 1fr;
-            }
+            .search-wrapper { max-width: none; }
+            .view-toggles { justify-content: center; }
+            #dataTable th, #dataTable td { padding: 12px 10px; font-size: 13px; }
+            .table-img { width: 56px; height: 56px; }
+            .scroll-hint { display: block; }
+            .cards-container { grid-template-columns: 1fr; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -984,7 +897,6 @@
     </style>
 </head>
 <body>
-    <!-- Pull to refresh indicator -->
     <div class="pull-indicator" id="pullIndicator">
         <span class="material-icons">refresh</span>
         <span>Release to refresh</span>
@@ -1066,8 +978,7 @@
             <p>Please check your connection and try again.</p>
         </div>
 
-        <!-- Table View -->
-        <div id="tableContainer" class="table-container">
+        <div id="tableContainer" class="table-container" style="display: none;">
             <div class="scroll-hint">
                 <span class="material-icons">swipe</span>
                 Scroll left/right to see more columns
@@ -1080,8 +991,7 @@
             </div>
         </div>
 
-        <!-- Card View -->
-        <div id="cardsContainer" class="cards-container"></div>
+        <div id="cardsContainer" class="cards-container" style="display: none;"></div>
     </div>
 
     <div id="imgModal" class="modal" onclick="closeModal()">
@@ -1095,9 +1005,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-    // =============================================
-    // CONFIGURATION
-    // =============================================
+    // Configuration
     const SHEET_ID = '1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ';
     
     const TABS_CONFIG = {
@@ -1106,7 +1014,7 @@
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v12_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v13_';
     const FAVORITES_KEY = 'medApp_favorites';
     const THEME_KEY = 'medApp_theme';
     
@@ -1119,10 +1027,7 @@
     let showFavoritesOnly = false;
     let lastRefreshTime = null;
 
-    // =============================================
-    // INITIALIZATION
-    // =============================================
-    
+    // Initialization
     function init() {
         loadTheme();
         loadFavorites();
@@ -1132,10 +1037,7 @@
         setupAutoRefresh();
     }
 
-    // =============================================
-    // THEME
-    // =============================================
-    
+    // Theme
     function loadTheme() {
         const saved = localStorage.getItem(THEME_KEY);
         if (saved === 'light') {
@@ -1159,16 +1061,11 @@
         localStorage.setItem(THEME_KEY, newTheme);
     }
 
-    // =============================================
-    // FAVORITES
-    // =============================================
-    
+    // Favorites
     function loadFavorites() {
         try {
             const saved = localStorage.getItem(FAVORITES_KEY);
-            if (saved) {
-                favorites = new Set(JSON.parse(saved));
-            }
+            if (saved) favorites = new Set(JSON.parse(saved));
         } catch (e) {
             favorites = new Set();
         }
@@ -1212,22 +1109,14 @@
     function updateFavoriteButtons() {
         document.querySelectorAll('.fav-btn, .card-fav-btn').forEach(btn => {
             const name = btn.dataset.name;
-            if (favorites.has(name)) {
-                btn.classList.add('active');
-                const icon = btn.querySelector('.material-icons');
-                if (icon) icon.textContent = 'favorite';
-            } else {
-                btn.classList.remove('active');
-                const icon = btn.querySelector('.material-icons');
-                if (icon) icon.textContent = 'favorite_border';
-            }
+            const isFav = favorites.has(name);
+            btn.classList.toggle('active', isFav);
+            const icon = btn.querySelector('.material-icons');
+            if (icon) icon.textContent = isFav ? 'favorite' : 'favorite_border';
         });
     }
 
-    // =============================================
-    // UTILITY FUNCTIONS
-    // =============================================
-    
+    // Utilities
     function getCsvUrl(gid) {
         return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
     }
@@ -1235,15 +1124,12 @@
     function getImageUrl(rawUrl) {
         if (!rawUrl || !rawUrl.trim()) return null;
         let url = rawUrl.trim();
-        let id = null;
-
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match) id = match[1];
+        let id = match ? match[1] : null;
         if (!id) {
             match = url.match(/id=([a-zA-Z0-9_-]+)/);
             if (match) id = match[1];
         }
-
         if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
         if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) return url;
         return null;
@@ -1252,9 +1138,8 @@
     function getPdfViewUrl(rawUrl) {
         if (!rawUrl || !rawUrl.trim()) return null;
         let url = rawUrl.trim();
-        let id = null;
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match) id = match[1];
+        let id = match ? match[1] : null;
         if (!id) {
             match = url.match(/id=([a-zA-Z0-9_-]+)/);
             if (match) id = match[1];
@@ -1266,58 +1151,35 @@
     function parseBoldText(text) {
         if (!text) return '';
         let result = text.toString();
-        
-        result = result
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-        
-        result = result
-            .replace(/&lt;b&gt;/gi, '<b>')
-            .replace(/&lt;\/b&gt;/gi, '</b>')
-            .replace(/&lt;strong&gt;/gi, '<strong>')
-            .replace(/&lt;\/strong&gt;/gi, '</strong>');
-        
+        result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        result = result.replace(/&lt;b&gt;/gi, '<b>').replace(/&lt;\/b&gt;/gi, '</b>')
+                       .replace(/&lt;strong&gt;/gi, '<strong>').replace(/&lt;\/strong&gt;/gi, '</strong>');
         result = result.replace(/\*\*([^*]+)\*\*/g, '<b class="bold-text">$1</b>');
         result = result.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        
         return result;
     }
 
     function updateFreshness() {
         const badge = document.getElementById('freshnessBadge');
-        
         if (!lastRefreshTime) {
             badge.textContent = 'No data';
             badge.classList.remove('fresh');
             return;
         }
-        
-        const now = Date.now();
-        const diff = now - lastRefreshTime;
-        const mins = Math.floor(diff / 60000);
-        
-        let text = '';
+        const mins = Math.floor((Date.now() - lastRefreshTime) / 60000);
         if (mins < 1) {
-            text = 'Just now';
+            badge.textContent = 'Just now';
             badge.classList.add('fresh');
         } else if (mins < 60) {
-            text = `${mins}m ago`;
+            badge.textContent = `${mins}m ago`;
             badge.classList.add('fresh');
         } else {
-            const hours = Math.floor(mins / 60);
-            text = `${hours}h ago`;
+            badge.textContent = `${Math.floor(mins / 60)}h ago`;
             badge.classList.remove('fresh');
         }
-        
-        badge.textContent = text;
     }
 
-    // =============================================
-    // DATA FETCHING
-    // =============================================
-    
+    // Data Fetching
     async function fetchTabData(tabKey, force = false) {
         const config = TABS_CONFIG[tabKey];
         const cacheKey = CACHE_KEY_PREFIX + tabKey;
@@ -1331,31 +1193,18 @@
                     if (cached.timestamp && (now - cached.timestamp < 300000)) {
                         return cached.data;
                     }
-                } catch (e) {
-                    console.error('Cache parse error:', e);
-                }
+                } catch (e) {}
             }
         }
 
-        const url = getCsvUrl(config.gid);
-        const response = await fetch(url);
-        
-        if (!response.ok) throw new Error('Network response not ok');
+        const response = await fetch(getCsvUrl(config.gid));
+        if (!response.ok) throw new Error('Network error');
         
         const csvText = await response.text();
-        const result = Papa.parse(csvText, { 
-            header: true, 
-            skipEmptyLines: true 
-        });
+        const result = Papa.parse(csvText, { header: true, skipEmptyLines: true });
         
-        const data = result.data;
-        
-        localStorage.setItem(cacheKey, JSON.stringify({
-            timestamp: now,
-            data: data
-        }));
-        
-        return data;
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, data: result.data }));
+        return result.data;
     }
 
     async function loadAllData(forceRefresh = false) {
@@ -1365,9 +1214,7 @@
         const tableContainer = document.getElementById('tableContainer');
         const cardsContainer = document.getElementById('cardsContainer');
         
-        if (forceRefresh) {
-            refreshBtn.classList.add('spin');
-        }
+        if (forceRefresh) refreshBtn.classList.add('spin');
         
         loadingState.style.display = 'block';
         errorState.style.display = 'none';
@@ -1389,11 +1236,12 @@
 
             loadingState.style.display = 'none';
             
+            // FIX: Properly show correct view after loading
             if (currentView === 'table') {
                 tableContainer.style.display = 'block';
                 renderTable(currentTab);
             } else {
-                cardsContainer.classList.add('active');
+                cardsContainer.style.display = 'grid';
                 renderCards(currentTab);
             }
             
@@ -1408,46 +1256,29 @@
         }
     }
 
-    // =============================================
-    // TABLE RENDERING
-    // =============================================
-    
+    // Table Rendering
     function renderTable(tabKey) {
         let data = allData[tabKey];
-        
         if (!data || data.length === 0) return;
 
-        // Filter by favorites if needed
         if (showFavoritesOnly) {
             const nameCol = Object.keys(data[0]).find(k => !CONFIG_COLUMNS.includes(k));
             data = data.filter(row => favorites.has(row[nameCol]));
         }
 
         if (data.length === 0) {
-            if (dataTableInstance) {
-                dataTableInstance.clear().draw();
-            }
+            if (dataTableInstance) dataTableInstance.clear().draw();
             return;
         }
 
         const firstRow = data[0];
 
         // Update page info
-        const titleEl = document.getElementById('pageTitle');
-        const dateEl = document.getElementById('pageDate');
+        document.getElementById('pageTitle').textContent = firstRow['CONFIG_TITLE'] || `${TABS_CONFIG[tabKey].name} Medications`;
+        document.title = firstRow['CONFIG_TITLE'] || `${TABS_CONFIG[tabKey].name} Medications`;
+        document.getElementById('pageDate').textContent = firstRow['CONFIG_DATE'] || '';
+
         const definitionEl = document.getElementById('pageDefinition');
-        const pdfBtn = document.getElementById('pdfButton');
-
-        if (firstRow['CONFIG_TITLE']) {
-            titleEl.textContent = firstRow['CONFIG_TITLE'];
-            document.title = firstRow['CONFIG_TITLE'];
-        } else {
-            titleEl.textContent = `${TABS_CONFIG[tabKey].name} Medications`;
-            document.title = `${TABS_CONFIG[tabKey].name} Medications`;
-        }
-
-        dateEl.textContent = firstRow['CONFIG_DATE'] || '';
-
         if (firstRow['CONFIG_DEFINITION']) {
             definitionEl.innerHTML = `<p>${parseBoldText(firstRow['CONFIG_DEFINITION'])}</p>`;
             definitionEl.classList.add('visible');
@@ -1455,6 +1286,7 @@
             definitionEl.classList.remove('visible');
         }
 
+        const pdfBtn = document.getElementById('pdfButton');
         if (firstRow['CONFIG_PDF']) {
             const pdfUrl = getPdfViewUrl(firstRow['CONFIG_PDF']);
             if (pdfUrl) {
@@ -1467,62 +1299,44 @@
             pdfBtn.style.display = 'none';
         }
 
-        // Get table headers
         const allHeaders = Object.keys(firstRow);
         const tableHeaders = allHeaders.filter(h => !CONFIG_COLUMNS.includes(h));
 
-        // Destroy existing table
         if (dataTableInstance) {
             dataTableInstance.clear().destroy();
             $('#dataTable').empty();
         }
 
-        // Build table HTML
-        let tableHtml = '<thead><tr><th></th>'; // Empty header for favorites column
-        tableHeaders.forEach(h => {
-            tableHtml += `<th>${h}</th>`;
-        });
+        let tableHtml = '<thead><tr><th></th>';
+        tableHeaders.forEach(h => tableHtml += `<th>${h}</th>`);
         tableHtml += '</tr></thead><tbody></tbody>';
         $('#dataTable').html(tableHtml);
 
-        // Column config
         const columnsConfig = [
             {
                 data: null,
                 orderable: false,
-                render: function(data, type, row) {
-                    const nameCol = tableHeaders[0];
-                    const name = row[nameCol];
+                render: (data, type, row) => {
+                    const name = row[tableHeaders[0]];
                     const isFav = favorites.has(name);
                     return `<button class="fav-btn ${isFav ? 'active' : ''}" data-name="${name.replace(/"/g, '&quot;')}" onclick="toggleFavorite('${name.replace(/'/g, "\\'")}')">
                         <span class="material-icons">${isFav ? 'favorite' : 'favorite_border'}</span>
                     </button>`;
                 }
             },
-            ...tableHeaders.map(key => {
-                return {
-                    data: key,
-                    render: function(data, type, row) {
-                        if (!data) return '';
-                        
-                        const rawVal = data.toString();
-                        
-                        const imgUrl = getImageUrl(rawVal);
-                        if (imgUrl) {
-                            return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'img-error\\'>Image Error</span>'" alt="Medication">`;
-                        }
-                        
-                        if (rawVal.toLowerCase() === 'no image') {
-                            return '<span class="no-image">No Image</span>';
-                        }
-                        
-                        return parseBoldText(rawVal);
-                    }
-                };
-            })
+            ...tableHeaders.map(key => ({
+                data: key,
+                render: (data, type, row) => {
+                    if (!data) return '';
+                    const rawVal = data.toString();
+                    const imgUrl = getImageUrl(rawVal);
+                    if (imgUrl) return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'img-error\\'>Image Error</span>'" alt="Medication">`;
+                    if (rawVal.toLowerCase() === 'no image') return '<span class="no-image">No Image</span>';
+                    return parseBoldText(rawVal);
+                }
+            }))
         ];
 
-        // Initialize DataTable
         dataTableInstance = $('#dataTable').DataTable({
             data: data,
             columns: columnsConfig,
@@ -1538,17 +1352,12 @@
             },
             initComplete: function() {
                 const currentSearch = $('#customSearch').val();
-                if (currentSearch) {
-                    this.api().search(currentSearch).draw();
-                }
+                if (currentSearch) this.api().search(currentSearch).draw();
             }
         });
     }
 
-    // =============================================
-    // CARD VIEW
-    // =============================================
-    
+    // Card Rendering
     function renderCards(tabKey) {
         let data = allData[tabKey];
         const container = document.getElementById('cardsContainer');
@@ -1562,7 +1371,6 @@
         const allHeaders = Object.keys(firstRow);
         const tableHeaders = allHeaders.filter(h => !CONFIG_COLUMNS.includes(h));
         
-        // Filter by favorites if needed
         if (showFavoritesOnly) {
             const nameCol = tableHeaders[0];
             data = data.filter(row => favorites.has(row[nameCol]));
@@ -1573,15 +1381,9 @@
             return;
         }
 
-        // Filter by search
         const searchTerm = $('#customSearch').val().toLowerCase();
         if (searchTerm) {
-            data = data.filter(row => {
-                return tableHeaders.some(h => {
-                    const val = row[h];
-                    return val && val.toString().toLowerCase().includes(searchTerm);
-                });
-            });
+            data = data.filter(row => tableHeaders.some(h => row[h] && row[h].toString().toLowerCase().includes(searchTerm)));
         }
 
         let html = '';
@@ -1590,24 +1392,17 @@
             const name = row[nameCol] || 'Unknown';
             const isFav = favorites.has(name);
             
-            // Find image
-            let imgUrl = null;
-            let imgCol = null;
+            let imgUrl = null, imgCol = null;
             for (const h of tableHeaders) {
-                const val = row[h];
-                if (val) {
-                    const url = getImageUrl(val.toString());
-                    if (url) {
-                        imgUrl = url;
-                        imgCol = h;
-                        break;
-                    }
+                if (row[h]) {
+                    const url = getImageUrl(row[h].toString());
+                    if (url) { imgUrl = url; imgCol = h; break; }
                 }
             }
 
             html += `<div class="med-card">
                 <div class="card-header">
-                    ${imgUrl ? `<img src="${imgUrl}" class="card-img" onclick="zoomImage('${imgUrl}')" alt="${name}">` : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: var(--fg-muted);">No image</div>`}
+                    ${imgUrl ? `<img src="${imgUrl}" class="card-img" onclick="zoomImage('${imgUrl}')" alt="${name}">` : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: var(--fg-muted); font-size: 12px;">No image</div>`}
                     <div class="card-title-section">
                         <h3 class="card-title">${parseBoldText(name)}</h3>
                     </div>
@@ -1619,13 +1414,10 @@
 
             tableHeaders.forEach(h => {
                 if (h === nameCol || h === imgCol) return;
-                
                 let val = row[h];
                 if (!val) return;
-                
                 const valStr = val.toString();
-                if (valStr.toLowerCase() === 'no image') return;
-                if (getImageUrl(valStr)) return;
+                if (valStr.toLowerCase() === 'no image' || getImageUrl(valStr)) return;
                 
                 html += `<div class="card-field">
                     <div class="card-field-label">${h}</div>
@@ -1639,10 +1431,7 @@
         container.innerHTML = html || '<p style="color: var(--fg-muted); text-align: center; padding: 40px;">No matching medications found</p>';
     }
 
-    // =============================================
-    // VIEW SWITCHING
-    // =============================================
-    
+    // View Switching - FIXED
     function switchView(view) {
         currentView = view;
         
@@ -1655,19 +1444,16 @@
 
         if (view === 'table') {
             tableContainer.style.display = 'block';
-            cardsContainer.classList.remove('active');
+            cardsContainer.style.display = 'none';
             renderTable(currentTab);
         } else {
             tableContainer.style.display = 'none';
-            cardsContainer.classList.add('active');
+            cardsContainer.style.display = 'grid';
             renderCards(currentTab);
         }
     }
 
-    // =============================================
-    // TAB SWITCHING
-    // =============================================
-    
+    // Tab Switching
     function switchTab(tabKey) {
         if (tabKey === currentTab) return;
 
@@ -1684,14 +1470,9 @@
         }
     }
 
-    // =============================================
-    // UI FUNCTIONS
-    // =============================================
-    
+    // UI Functions
     function forceRefresh() {
-        Object.keys(TABS_CONFIG).forEach(key => {
-            localStorage.removeItem(CACHE_KEY_PREFIX + key);
-        });
+        Object.keys(TABS_CONFIG).forEach(key => localStorage.removeItem(CACHE_KEY_PREFIX + key));
         loadAllData(true);
     }
 
@@ -1706,87 +1487,50 @@
         document.getElementById('imgModal').classList.remove('active');
     }
 
-    // =============================================
-    // PULL TO REFRESH (Mobile)
-    // =============================================
-    
+    // Pull to Refresh
     function setupPullToRefresh() {
-        let startY = 0;
-        let pulling = false;
+        let startY = 0, pulling = false;
         const indicator = document.getElementById('pullIndicator');
 
-        document.addEventListener('touchstart', function(e) {
-            if (window.scrollY === 0) {
-                startY = e.touches[0].pageY;
-                pulling = true;
-            }
+        document.addEventListener('touchstart', e => {
+            if (window.scrollY === 0) { startY = e.touches[0].pageY; pulling = true; }
         }, { passive: true });
 
-        document.addEventListener('touchmove', function(e) {
+        document.addEventListener('touchmove', e => {
             if (!pulling) return;
-            
-            const currentY = e.touches[0].pageY;
-            const diff = currentY - startY;
-            
-            if (diff > 80 && window.scrollY === 0) {
-                indicator.classList.add('visible');
-            } else {
-                indicator.classList.remove('visible');
-            }
+            const diff = e.touches[0].pageY - startY;
+            indicator.classList.toggle('visible', diff > 80 && window.scrollY === 0);
         }, { passive: true });
 
-        document.addEventListener('touchend', function() {
-            if (indicator.classList.contains('visible')) {
-                forceRefresh();
-            }
+        document.addEventListener('touchend', () => {
+            if (indicator.classList.contains('visible')) forceRefresh();
             indicator.classList.remove('visible');
             pulling = false;
         }, { passive: true });
     }
 
-    // =============================================
-    // SEARCH
-    // =============================================
-    
+    // Search
     function setupSearch() {
         $('#customSearch').on('keyup clear', function() {
-            const term = $(this).val();
-            
             if (currentView === 'table' && dataTableInstance) {
-                dataTableInstance.search(term).draw();
+                dataTableInstance.search($(this).val()).draw();
             } else if (currentView === 'cards') {
                 renderCards(currentTab);
             }
         });
     }
 
-    // =============================================
-    // AUTO REFRESH
-    // =============================================
-    
+    // Auto Refresh
     function setupAutoRefresh() {
-        // Update freshness every minute
         setInterval(updateFreshness, 60000);
-        
-        // Auto-refresh data every 5 minutes
-        setInterval(() => {
-            loadAllData(false);
-        }, 300000);
+        setInterval(() => loadAllData(false), 300000);
     }
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    });
+    // Keyboard
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // =============================================
-    // START
-    // =============================================
-    
+    // Start
     $(document).ready(init);
 </script>
-
 </body>
 </html>
