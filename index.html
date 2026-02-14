@@ -1,34 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High Alert Medications</title>
+    <title>High Alert Medications - Injection & Oral</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f4f9; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            background-color: #f4f4f9; 
+        }
 
-        /* Header Styling */
+        /* Header Styling - STICKY */
         .app-header {
-            background-color: #d32f2f;
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
             color: white;
-            padding: 15px 30px;
+            padding: 20px 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        .header-content { display: flex; align-items: center; gap: 15px; }
-        .title-block { display: flex; flex-direction: column; align-items: flex-end; }
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
         .app-header h1 {
             margin: 0;
-            font-size: clamp(18px, 4vw, 24px);
+            font-size: clamp(18px, 4vw, 26px);
             letter-spacing: 1px;
             line-height: 1.2;
         }
@@ -36,11 +52,39 @@
         #pageDate {
             font-size: clamp(12px, 2.5vw, 14px);
             opacity: 0.9;
-            margin-top: 2px;
+            margin-top: 5px;
         }
 
         /* Container */
-        .container { max-width: 1200px; margin: 20px auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
+        .container { 
+            max-width: 1400px; 
+            margin: 20px auto; 
+            background: white; 
+            padding: 20px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            border-radius: 8px; 
+        }
+
+        /* Section Title */
+        .section-title {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            padding: 15px 20px;
+            margin: 30px -20px 20px -20px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title .material-icons {
+            font-size: 24px;
+        }
 
         /* Control Row Layout */
         .control-row {
@@ -50,132 +94,270 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             position: sticky;
-            top: 60px; 
+            top: 80px;
             background-color: white;
-            z-index: 99;
-            padding: 10px 0 20px 0;
+            z-index: 999;
+            padding: 15px 0;
             margin-left: -20px;
             margin-right: -20px;
             padding-left: 20px;
             padding-right: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid #e0e0e0;
         }
 
-        .search-wrapper { flex-grow: 1; min-width: 200px; }
+        .search-wrapper { 
+            flex-grow: 1; 
+            min-width: 200px; 
+        }
+
         .custom-search-input {
-            width: 100%; padding: 12px 20px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px;
-            box-sizing: border-box; transition: border-color 0.3s;
+            width: 100%; 
+            padding: 12px 20px; 
+            font-size: 16px; 
+            border: 2px solid #ddd; 
+            border-radius: 6px;
+            box-sizing: border-box; 
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .custom-search-input:focus { border-color: #d32f2f; outline: none; }
 
-        .download-group { display: flex; align-items: center; gap: 10px; }
-        .download-label { font-size: 14px; color: #555; font-weight: 600; }
+        .custom-search-input:focus { 
+            border-color: #d32f2f; 
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .download-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .download-label { 
+            font-size: 14px; 
+            color: #555; 
+            font-weight: 600; 
+        }
 
         .header-btn {
-            background-color: white; color: #d32f2f; padding: 10px 16px; border-radius: 4px;
-            text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex;
-            align-items: center; gap: 5px; transition: opacity 0.2s; border: 2px solid #d32f2f; cursor: pointer;
+            background-color: white; 
+            color: #d32f2f; 
+            padding: 10px 16px; 
+            border-radius: 6px;
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 14px; 
+            display: inline-flex;
+            align-items: center; 
+            gap: 5px; 
+            transition: all 0.2s; 
+            border: 2px solid #d32f2f; 
+            cursor: pointer;
         }
-        .header-btn:hover { background-color: #fff5f5; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        #refreshBtn { background-color: #2196f3; color: white; border-color: #2196f3; }
-        #refreshBtn:hover { background-color: #1976d2; border-color: #1976d2; }
+        .header-btn:hover { 
+            background-color: #fff5f5; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            transform: translateY(-1px);
+        }
+
+        #refreshBtn { 
+            background-color: #2196f3; 
+            color: white; 
+            border-color: #2196f3; 
+        }
+
+        #refreshBtn:hover { 
+            background-color: #1976d2; 
+            border-color: #1976d2; 
+        }
 
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Section Titles */
-        .section-title {
-            font-size: 18px;
-            color: #1976d2;
-            margin: 30px 0 15px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #1976d2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .section-title:first-of-type { margin-top: 0; }
-
-        /* --- CARD STYLE TABLE --- */
-        .dataTables_wrapper { margin-bottom: 20px; }
-        
-        table.dataTable { 
-            width: 100% !important; 
-            border-collapse: separate;
-            border-spacing: 0 10px;
+        /* Table Styling */
+        .dataTables_wrapper {
+            margin-top: 10px;
         }
 
-        table.dataTable thead th { 
-            background-color: #1976d2;
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: collapse;
+        }
+
+        table.dataTable thead th {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
             color: white;
-            text-align: left; 
-            padding: 12px 10px;
+            padding: 14px 12px;
             font-weight: bold;
-            border-top: none;
-            border-bottom: none;
-        }
-        
-        table.dataTable thead th:first-child { border-radius: 8px 0 0 8px; }
-        table.dataTable thead th:last-child { border-radius: 0 8px 8px 0; }
-
-        table.dataTable tbody td {
-            padding: 15px 10px;
-            vertical-align: middle;
-            line-height: 1.5;
-            background-color: #fff;
-            border-top: 1px solid #e0e0e0;
-            border-bottom: 1px solid #e0e0e0;
-            color: #333;
+            text-align: left;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        table.dataTable tbody td:first-child {
-            white-space: nowrap;
-            font-weight: 700;
-            border-left: 1px solid #e0e0e0;
+        table.dataTable thead th:first-child {
             border-radius: 8px 0 0 8px;
         }
 
-        table.dataTable tbody td:last-child {
-            border-right: 1px solid #e0e0e0;
+        table.dataTable thead th:last-child {
             border-radius: 0 8px 8px 0;
         }
 
-        /* Image Styling */
-        .table-img { 
-            width: 80px; 
-            height: 80px; 
-            object-fit: cover; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            border: 1px solid #eee; 
-            transition: transform 0.2s; 
-            background-color: #f0f0f0; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        table.dataTable tbody tr {
+            background-color: #fff;
+            transition: background-color 0.2s;
         }
-        .table-img:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .no-image { color: #999; font-style: italic; font-size: 0.9em; }
 
-        /* Bold Text Support */
-        table.dataTable tbody td b, table.dataTable tbody td strong { font-weight: 700; color: #000; }
+        table.dataTable tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        table.dataTable tbody td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        table.dataTable tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Bold text styling - IMPORTANT */
+        table.dataTable tbody td b,
+        table.dataTable tbody td strong {
+            color: #d32f2f;
+            font-weight: 700;
+        }
+
+        /* First column - Medication Name */
+        table.dataTable tbody td:first-child {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .loading-state .material-icons {
+            font-size: 48px;
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .loading-state p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .error-state {
+            color: #d32f2f;
+        }
+
+        .error-state .material-icons {
+            color: #d32f2f;
+        }
 
         /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-        .modal-content { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.85); 
+            justify-content: center; 
+            align-items: center; 
+        }
 
-        /* Loading */
-        .loading-overlay { text-align: center; padding: 40px; font-weight: bold; color: #555; }
+        .modal-content { 
+            max-width: 90%; 
+            max-height: 90%; 
+            border-radius: 8px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .app-header { padding: 15px; }
-            .header-content { flex-direction: column; gap: 5px; }
-            .title-block { align-items: center; }
-            .container { margin: 10px; padding: 15px; }
-            .control-row { top: 70px; margin-left: -15px; margin-right: -15px; padding-left: 15px; padding-right: 15px; }
-            
-            table.dataTable tbody td { white-space: normal !important; }
-            table.dataTable thead th { white-space: nowrap; }
+            .app-header { 
+                padding: 15px; 
+            }
+
+            .header-content { 
+                flex-direction: column; 
+                gap: 5px; 
+            }
+
+            .container { 
+                margin: 10px; 
+                padding: 15px; 
+            }
+
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+                top: 70px;
+                margin-left: -15px;
+                margin-right: -15px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .search-wrapper { 
+                width: 100%; 
+            }
+
+            .button-group, .download-group { 
+                justify-content: center; 
+                margin-top: 10px; 
+            }
+
+            .section-title {
+                padding: 12px 15px;
+                font-size: 16px;
+                margin-left: -15px;
+                margin-right: -15px;
+            }
+
+            table.dataTable thead th {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+
+            table.dataTable tbody td {
+                padding: 10px 8px;
+                font-size: 14px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .app-header {
+                position: relative;
+            }
+            .control-row {
+                display: none;
+            }
+            .section-title {
+                background: #1976d2 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -184,341 +366,301 @@
 <div class="app-header">
     <div class="header-content">
         <div class="title-block">
-            <h1 id="pageTitle">HIGH ALERT MEDICATIONS</h1>
-            <div id="pageDate"></div>
+            <h1>HIGH ALERT MEDICATIONS</h1>
+            <div id="pageDate">Injection & Oral Reference Guide</div>
         </div>
     </div>
 </div>
 
 <div class="container">
 
+    <!-- Control Row -->
     <div class="control-row">
         <div class="search-wrapper">
-            <input type="text" id="customSearch" class="custom-search-input" placeholder="Search both Injection & Oral...">
+            <input type="text" id="customSearch" class="custom-search-input" placeholder="Cari nama ubat atau maklumat...">
         </div>
 
-        <button id="refreshBtn" onclick="forceRefresh()" class="header-btn">
-            <span class="material-icons" style="font-size: 18px;">refresh</span>
-            Refresh
-        </button>
+        <div class="button-group">
+            <button id="refreshBtn" onclick="forceRefresh()" class="header-btn">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+                Refresh
+            </button>
 
-        <div class="download-group">
-            <span class="download-label">Muat turun:</span>
-            <a id="pdfButton" href="#" target="_blank" class="header-btn" style="display: none;">
-                <span class="material-icons" style="font-size: 18px;">picture_as_pdf</span>
-                PDF
-            </a>
+            <div class="download-group">
+                <span class="download-label">Muat Turun:</span>
+                <a id="downloadInjection" href="https://docs.google.com/spreadsheets/d/1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ/export?format=pdf&gid=0" target="_blank" class="header-btn">
+                    <span class="material-icons" style="font-size: 18px;">picture_as_pdf</span>
+                    Injection PDF
+                </a>
+                <a id="downloadOral" href="https://docs.google.com/spreadsheets/d/1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ/export?format=pdf&gid=1948005281" target="_blank" class="header-btn">
+                    <span class="material-icons" style="font-size: 18px;">picture_as_pdf</span>
+                    Oral PDF
+                </a>
+            </div>
         </div>
     </div>
 
-    <div id="loading" class="loading-overlay">Initializing Data...</div>
-
-    <!-- SECTION 1: INJECTION -->
-    <div id="injectionSection" style="display:none;">
-        <div class="section-title">
-            <span>Injection</span>
-        </div>
-        <table id="injectionTable" class="display">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
+    <!-- Injection Section -->
+    <div class="section-title">
+        <span class="material-icons">vaccines</span>
+        INJECTION (Suntikan)
     </div>
 
-    <!-- SECTION 2: ORAL -->
-    <div id="oralSection" style="display:none;">
-        <div class="section-title">
-            <span>Oral</span>
-        </div>
-        <table id="oralTable" class="display">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
+    <div id="injectionLoading" class="loading-state">
+        <span class="material-icons spin">autorenew</span>
+        <p>Memuatkan data Injection...</p>
     </div>
+
+    <table id="injectionTable" style="display: none;">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Oral Section -->
+    <div class="section-title">
+        <span class="material-icons">medication</span>
+        ORAL (Mulut)
+    </div>
+
+    <div id="oralLoading" class="loading-state">
+        <span class="material-icons spin">autorenew</span>
+        <p>Memuatkan data Oral...</p>
+    </div>
+
+    <table id="oralTable" style="display: none;">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
 
 </div>
 
+<!-- Image Modal -->
 <div id="imgModal" class="modal" onclick="this.style.display='none'">
     <img class="modal-content" id="modalImg">
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
-    // --- CONFIGURATION ---
-    const SHEET_ID = '1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ';
-    
-    // We MUST use the "Publish to Web" URL for Bold text to work and avoid CORS errors
-    // Make sure you have published your sheets (File > Share > Publish to Web)
-    const URL_INJECTION = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pubhtml?gid=0&single=true`;
-    const URL_ORAL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pubhtml?gid=1948005281&single=true`;
+    // --- CONFIG ---
+    const SHEETS = {
+        injection: {
+            name: 'Injection',
+            htmlUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxDFAZ-cdFiY1czj9kj3KXMw1NUIX4effIsGIA1RFy026jE_oL2-xkXyrGCjc5KGAZorjFmNSD6hlM/pubhtml?gid=0&single=true&headers=false',
+            csvUrl: 'https://docs.google.com/spreadsheets/d/1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ/export?format=csv&gid=0'
+        },
+        oral: {
+            name: 'Oral',
+            htmlUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxDFAZ-cdFiY1czj9kj3KXMw1NUIX4effIsGIA1RFy026jE_oL2-xkXyrGCjc5KGAZorjFmNSD6hlM/pubhtml?gid=1948005281&single=true&headers=false',
+            csvUrl: 'https://docs.google.com/spreadsheets/d/1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ/export?format=csv&gid=1948005281'
+        }
+    };
 
-    const CACHE_KEY = 'medAppDualCache_v3_pub';
-    const CONFIG_COLS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
+    const CACHE_KEY = 'medAppCache_v10';
+    let injectionTable = null;
+    let oralTable = null;
 
-    let tableInjection, tableOral;
-
-    // --- PARSING HELPERS ---
-    
-    function parseHtmlTable(htmlString, tableId) {
+    // --- PARSE HTML TABLE (Preserves Bold) ---
+    function parseHtmlTable(htmlText) {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
+        const doc = parser.parseFromString(htmlText, 'text/html');
         const table = doc.querySelector('table');
         
-        if (!table) return { config: {}, data: [], headers: [] };
+        if (!table) return { headers: [], rows: [] };
 
-        const rows = table.querySelectorAll('tr');
+        const allRows = table.querySelectorAll('tr');
+        if (allRows.length === 0) return { headers: [], rows: [] };
+
+        // First row as headers
+        const headerRow = allRows[0];
         const headers = [];
-        const data = [];
-        let config = {};
+        headerRow.querySelectorAll('td, th').forEach(cell => {
+            headers.push(cell.textContent.trim());
+        });
 
-        // 1. Get Headers from first row
-        const headerRow = rows[0];
-        if (headerRow) {
-            headerRow.querySelectorAll('td').forEach((cell) => {
-                headers.push(cell.innerText.trim());
-            });
-        }
-
-        // 2. Process Body
-        for (let i = 1; i < rows.length; i++) {
-            const cells = rows[i].querySelectorAll('td');
-            if (cells.length === 0) continue;
-
-            let rowObj = {};
-            let isConfigRow = false;
-            let isEmptyRow = true;
-
+        // Remaining rows as data (preserve HTML for bold)
+        const rows = [];
+        for (let i = 1; i < allRows.length; i++) {
+            const row = allRows[i];
+            const rowData = {};
+            const cells = row.querySelectorAll('td, th');
+            
             cells.forEach((cell, index) => {
-                const key = headers[index];
-                if (!key) return;
-
-                // Get innerHTML to preserve BOLD tags
-                let val = cell.innerHTML.trim();
-                let textVal = cell.innerText.trim();
-
-                if (textVal) isEmptyRow = false;
-
-                // Check for Config Keys
-                if (CONFIG_COLS.includes(key)) {
-                    isConfigRow = true;
-                    config[key] = textVal; // Config values usually want plain text
-                } else {
-                    rowObj[key] = val; // Store HTML for data
+                if (index < headers.length) {
+                    const headerName = headers[index];
+                    // Get innerHTML to preserve <b> tags
+                    rowData[headerName] = cell.innerHTML.trim();
                 }
             });
-
-            // Skip empty rows
-            if (isEmptyRow) continue;
-
-            if (!isConfigRow) {
-                data.push(rowObj);
+            
+            // Only add non-empty rows
+            const hasContent = Object.values(rowData).some(v => v && v.trim() !== '');
+            if (hasContent) {
+                rows.push(rowData);
             }
         }
 
-        return { config, data, headers };
+        return { headers, rows };
     }
 
-    function getImageUrl(rawHtml) {
-        if (!rawHtml) return null;
-        
-        // Check if cell already contains an image tag
-        if (rawHtml.includes('<img')) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(rawHtml, 'text/html');
-            const img = doc.querySelector('img');
-            if (img && img.src) return img.src;
+    // --- RENDER TABLE ---
+    function renderTable(tableId, data, loadingId) {
+        const $loading = $('#' + loadingId);
+        const $table = $('#' + tableId);
+
+        if (!data || !data.headers || data.headers.length === 0 || !data.rows || data.rows.length === 0) {
+            $loading.html(`
+                <span class="material-icons error-state">error_outline</span>
+                <p class="error-state">Tiada data dijumpai</p>
+            `);
+            return null;
         }
 
-        // Fallback: Check for URL text
-        // We strip HTML tags to get the raw URL if it's wrapped in bold etc.
-        const div = document.createElement('div');
-        div.innerHTML = rawHtml;
-        const text = div.innerText.trim();
-        
-        if (!text) return null;
-        
-        let id = null;
-        let match = text.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match) id = match[1];
-        if (!id) { match = text.match(/id=([a-zA-Z0-9_-]+)/); if (match) id = match[1]; }
-
-        if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-        if (text.match(/\.(jpeg|jpg|gif|png|webp)/i)) return text;
-        
-        return null;
-    }
-
-    // --- INITIALIZATION ---
-
-    function initDataTable(tableId, data, headers) {
-        if ($.fn.dataTable.isDataTable(`#${tableId}`)) {
-            $(`#${tableId}`).DataTable().clear().destroy();
-            $(`#${tableId}`).empty();
-        }
-
-        // Build Header HTML
+        // Build table HTML
         let headerHtml = '<tr>';
-        headers.forEach(h => {
-            if (!CONFIG_COLS.includes(h)) {
+        data.headers.forEach(h => {
+            if (h && h.trim()) {
                 headerHtml += `<th>${h}</th>`;
             }
         });
         headerHtml += '</tr>';
-        $(`#${tableId} thead`).html(headerHtml);
 
-        // Configure Columns
-        const columns = headers
-            .filter(h => !CONFIG_COLS.includes(h))
-            .map(key => {
-                return {
-                    data: key,
-                    render: function(data, type, row) {
-                        if (!data) return "";
-                        
-                        // 1. Handle Images
-                        let imgUrl = getImageUrl(data);
-                        if (imgUrl) {
-                            return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'no-image\\'>Image Error</span>'">`;
-                        }
-                        
-                        // 2. Handle "No Image" text
-                        let plainText = $("<div>").html(data).text().trim().toLowerCase();
-                        if (plainText === 'no image') return `<span class="no-image">No Image</span>`;
-                        
-                        // 3. Return HTML (Preserves <b>, <span>, <br>)
-                        return data;
-                    }
-                };
-            });
+        $table.find('thead').html(headerHtml);
+        $table.find('tbody').empty();
 
-        return $(`#${tableId}`).DataTable({
-            data: data,
-            columns: columns,
+        // Destroy existing DataTable
+        if ($.fn.dataTable.isDataTable($table)) {
+            $table.DataTable().clear().destroy();
+        }
+
+        $table.show();
+        $loading.hide();
+
+        // Column config
+        const columnsConfig = data.headers
+            .filter(h => h && h.trim())
+            .map(key => ({
+                data: key,
+                render: function(data, type, row) {
+                    if (!data) return "";
+                    return data;
+                }
+            }));
+
+        // Initialize DataTable
+        const dt = $table.DataTable({
+            data: data.rows,
+            columns: columnsConfig,
             dom: 't',
             paging: false,
             info: false,
             ordering: true,
             searching: true,
+            order: [],
             initComplete: function() {
-                // Re-apply global search after init
-                 let currentSearch = $('#customSearch').val();
-                 this.api().search(currentSearch).draw();
+                $('#refreshBtn .material-icons').removeClass('spin');
             }
         });
+
+        return dt;
     }
 
-    function applyGlobalConfig(config) {
-        if (config['CONFIG_TITLE']) {
-            $('#pageTitle').text(config['CONFIG_TITLE']);
-            document.title = config['CONFIG_TITLE'];
-        }
-        if (config['CONFIG_DATE']) $('#pageDate').text(config['CONFIG_DATE']);
-        if (config['CONFIG_PDF']) {
-            let id = null;
-            let match = config['CONFIG_PDF'].match(/\/d\/([a-zA-Z0-9_-]+)/);
-            if (match) id = match[1];
-            if (id) {
-                $('#pdfButton').attr('href', `https://drive.google.com/file/d/${id}/view`).show();
-            } else {
-                 $('#pdfButton').attr('href', config['CONFIG_PDF']).show();
-            }
-        }
-    }
+    // --- FETCH DATA ---
+    async function fetchSheetData(sheetKey, force = false) {
+        const sheet = SHEETS[sheetKey];
+        const cacheKey = `${CACHE_KEY}_${sheetKey}`;
+        const now = Date.now();
 
-    // --- DATA FLOW ---
-
-    async function loadAllData(force = false) {
-        $('#loading').show();
-        $('#injectionSection').hide();
-        $('#oralSection').hide();
-        $('#refreshBtn .material-icons').addClass('spin');
-
-        try {
-            // 1. Fetch Injection
-            const injData = await fetchData(URL_INJECTION, 'inj_cache', force);
-            if (injData && injData.data.length > 0) {
-                $('#injectionSection').show();
-                tableInjection = initDataTable('injectionTable', injData.data, injData.headers);
-                applyGlobalConfig(injData.config); 
-            } else {
-                console.error("Injection data empty or failed");
-            }
-
-            // 2. Fetch Oral
-            const oralData = await fetchData(URL_ORAL, 'oral_cache', force);
-            if (oralData && oralData.data.length > 0) {
-                $('#oralSection').show();
-                tableOral = initDataTable('oralTable', oralData.data, oralData.headers);
-            } else {
-                console.error("Oral data empty or failed");
-            }
-            
-            $('#loading').hide();
-
-        } catch (err) {
-            console.error(err);
-            $('#loading').html("Error loading data. Did you 'Publish to Web'? <br><small>Check console for details (F12)</small>").css('color', 'red');
-        } finally {
-            $('#refreshBtn .material-icons').removeClass('spin');
-        }
-    }
-
-    async function fetchData(url, cacheKey, force) {
-        const now = new Date().getTime();
-        
+        // Try cache first
         if (!force) {
             const cached = localStorage.getItem(cacheKey);
             if (cached) {
                 try {
-                    const obj = JSON.parse(cached);
-                    if (obj && obj.data) return obj;
-                } catch(e) { console.log("Cache parse error"); }
+                    const parsed = JSON.parse(cached);
+                    return parsed.data;
+                } catch (e) {
+                    console.error('Cache parse error:', e);
+                }
             }
         }
 
         try {
-            const response = await fetch(url + '&t=' + now);
-            if (!response.ok) throw new Error("Network response was not ok");
+            // Use CORS proxy for HTML fetch
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(sheet.htmlUrl)}`;
+            const response = await fetch(proxyUrl);
             const htmlText = await response.text();
-            const parsed = parseHtmlTable(htmlText);
-            localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, ...parsed }));
-            return parsed;
-        } catch (e) {
-            console.error("Fetch Error:", e);
-            throw e; // Propagate error to UI
+            
+            const data = parseHtmlTable(htmlText);
+            
+            // Cache the result
+            localStorage.setItem(cacheKey, JSON.stringify({
+                timestamp: now,
+                data: data
+            }));
+
+            return data;
+        } catch (error) {
+            console.error(`Error fetching ${sheet.name}:`, error);
+            return null;
         }
     }
 
-    function searchBoth(val) {
-        // Safe check if tables exist
-        if ($.fn.dataTable.isDataTable('#injectionTable')) {
-            $('#injectionTable').DataTable().search(val).draw();
+    // --- LOAD ALL DATA ---
+    async function loadAllData(force = false) {
+        if (force) {
+            $('#refreshBtn .material-icons').addClass('spin');
+            $('#injectionLoading').html('<span class="material-icons spin">autorenew</span><p>Memuat semula...</p>').show();
+            $('#oralLoading').html('<span class="material-icons spin">autorenew</span><p>Memuat semula...</p>').show();
+            $('#injectionTable, #oralTable').hide();
         }
-        if ($.fn.dataTable.isDataTable('#oralTable')) {
-            $('#oralTable').DataTable().search(val).draw();
+
+        // Fetch both sheets in parallel
+        const [injectionData, oralData] = await Promise.all([
+            fetchSheetData('injection', force),
+            fetchSheetData('oral', force)
+        ]);
+
+        // Render tables
+        injectionTable = renderTable('injectionTable', injectionData, 'injectionLoading');
+        oralTable = renderTable('oralTable', oralData, 'oralLoading');
+
+        // Re-apply search
+        const currentSearch = $('#customSearch').val();
+        if (currentSearch) {
+            if (injectionTable) injectionTable.search(currentSearch).draw();
+            if (oralTable) oralTable.search(currentSearch).draw();
         }
+
+        $('#refreshBtn .material-icons').removeClass('spin');
     }
 
-    function zoomImage(src) {
-        const modal = document.getElementById('imgModal');
-        const modalImg = document.getElementById('modalImg');
-        modal.style.display = "flex";
-        modalImg.src = src;
-    }
-
+    // --- FORCE REFRESH ---
     function forceRefresh() {
-        localStorage.removeItem('inj_cache');
-        localStorage.removeItem('oral_cache');
         loadAllData(true);
     }
 
-    // --- EVENTS ---
+    // --- SEARCH HANDLER ---
+    function handleSearch(value) {
+        if (injectionTable && $.fn.dataTable.isDataTable('#injectionTable')) {
+            injectionTable.search(value).draw();
+        }
+        if (oralTable && $.fn.dataTable.isDataTable('#oralTable')) {
+            oralTable.search(value).draw();
+        }
+    }
+
+    // --- INIT ---
     $(document).ready(function() {
         loadAllData();
 
+        // Search input
         $('#customSearch').on('keyup clear', function() {
-            searchBoth($(this).val());
+            handleSearch($(this).val());
         });
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => loadAllData(false), 300000);
     });
 </script>
 </body>
