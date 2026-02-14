@@ -909,12 +909,14 @@
 
             .tabs-wrapper {
                 width: 100%;
+                flex-wrap: wrap;
             }
 
             .tab-btn {
                 flex: 1;
                 text-align: center;
-                padding: 0.75rem 1rem;
+                padding: 0.75rem 0.5rem;
+                font-size: 0.75rem;
             }
 
             .main-container {
@@ -973,8 +975,8 @@
             }
 
             .tab-btn {
-                padding: 0.625rem 0.75rem;
-                font-size: 0.8125rem;
+                padding: 0.625rem 0.5rem;
+                font-size: 0.6875rem;
             }
 
             .tab-btn .badge {
@@ -1049,6 +1051,10 @@
                     IV to Oral
                     <span class="badge" id="ivToOral-count">-</span>
                 </button>
+                <button class="tab-btn" data-tab="coughCold" onclick="switchTab('coughCold')">
+                    Cough & Cold
+                    <span class="badge" id="coughCold-count">-</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1116,18 +1122,19 @@
     const TABS_CONFIG = {
         injection: { gid: '0', name: 'Injection' },
         oral: { gid: '1948005281', name: 'Oral' },
-        ivToOral: { gid: '816449873', name: 'IV to Oral' }
+        ivToOral: { gid: '816449873', name: 'IV to Oral' },
+        coughCold: { gid: '1886161671', name: 'Cough & Cold Medicines' }
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v16_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v17_';
     const FAVORITES_KEY = 'medApp_favorites';
     const THEME_KEY = 'medApp_theme';
     
     let currentTab = 'injection';
     let currentView = 'table';
     let dataTableInstance = null;
-    let allData = { injection: null, oral: null, ivToOral: null };
+    let allData = { injection: null, oral: null, ivToOral: null, coughCold: null };
     let favorites = new Set();
     let showFavoritesOnly = false;
     let lastRefreshTime = null;
@@ -1356,20 +1363,23 @@
         cardsContainer.style.display = 'none';
 
         try {
-            const [injectionData, oralData, ivToOralData] = await Promise.all([
+            const [injectionData, oralData, ivToOralData, coughColdData] = await Promise.all([
                 fetchTabData('injection', forceRefresh),
                 fetchTabData('oral', forceRefresh),
-                fetchTabData('ivToOral', forceRefresh)
+                fetchTabData('ivToOral', forceRefresh),
+                fetchTabData('coughCold', forceRefresh)
             ]);
 
             allData.injection = injectionData;
             allData.oral = oralData;
             allData.ivToOral = ivToOralData;
+            allData.coughCold = coughColdData;
             lastRefreshTime = Date.now();
 
             document.getElementById('injection-count').textContent = injectionData ? injectionData.length : '0';
             document.getElementById('oral-count').textContent = oralData ? oralData.length : '0';
             document.getElementById('ivToOral-count').textContent = ivToOralData ? ivToOralData.length : '0';
+            document.getElementById('coughCold-count').textContent = coughColdData ? coughColdData.length : '0';
 
             loadingState.style.display = 'none';
             
