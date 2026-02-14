@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0f1c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Medication Database</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -22,6 +25,21 @@
             --danger-glow: rgba(239, 68, 68, 0.2);
             --border: #2d3a4f;
             --header-bg: #0f172a;
+            --shadow: rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --bg-elevated: #ffffff;
+            --bg-card: #ffffff;
+            --fg: #0f172a;
+            --fg-muted: #64748b;
+            --accent: #059669;
+            --accent-hover: #10b981;
+            --accent-glow: rgba(5, 150, 105, 0.2);
+            --border: #e2e8f0;
+            --header-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.08);
         }
 
         * {
@@ -34,6 +52,7 @@
             background: var(--bg);
             color: var(--fg);
             min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         body::before {
@@ -50,6 +69,39 @@
             z-index: 0;
         }
 
+        [data-theme="light"] body::before {
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 0%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+        }
+
+        /* Pull to refresh indicator */
+        .pull-indicator {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-60px);
+            background: var(--accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 0 0 20px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 1000;
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pull-indicator.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .pull-indicator .material-icons {
+            font-size: 18px;
+        }
+
         .app-header {
             background: linear-gradient(180deg, var(--header-bg) 0%, rgba(15, 23, 42, 0.95) 100%);
             backdrop-filter: blur(12px);
@@ -58,6 +110,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        [data-theme="light"] .app-header {
+            background: linear-gradient(180deg, var(--header-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
         }
 
         .header-inner {
@@ -104,20 +161,43 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             color: var(--fg);
+            transition: color 0.3s ease;
+        }
+
+        .title-block .page-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .page-date {
+            font-size: 13px;
+            color: var(--fg-muted);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .freshness-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--fg-muted);
+            border: 1px solid var(--border);
             transition: all 0.3s ease;
         }
 
-        .title-block .page-date {
-            font-size: 13px;
-            color: var(--fg-muted);
-            margin-top: 2px;
-            font-weight: 500;
+        .freshness-badge.fresh {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border-color: rgba(16, 185, 129, 0.3);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
@@ -134,6 +214,7 @@
             transition: all 0.2s ease;
             text-decoration: none;
             white-space: nowrap;
+            font-family: inherit;
         }
 
         .btn-primary {
@@ -159,6 +240,18 @@
             border-color: var(--accent);
         }
 
+        .btn-secondary.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-icon {
+            padding: 10px;
+            min-width: 44px;
+            justify-content: center;
+        }
+
         .btn .material-icons {
             font-size: 18px;
         }
@@ -179,6 +272,7 @@
             padding: 4px;
             border-radius: 12px;
             width: fit-content;
+            transition: background 0.3s ease;
         }
 
         .tab-btn {
@@ -192,11 +286,16 @@
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
+            font-family: inherit;
         }
 
         .tab-btn:hover {
             color: var(--fg);
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .tab-btn.active {
@@ -247,14 +346,8 @@
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .definition-box p {
@@ -264,12 +357,18 @@
             color: var(--fg);
         }
 
-        .search-container {
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .search-wrapper {
             position: relative;
+            flex: 1;
+            min-width: 200px;
             max-width: 400px;
         }
 
@@ -281,6 +380,7 @@
             color: var(--fg-muted);
             font-size: 20px;
             pointer-events: none;
+            transition: color 0.3s ease;
         }
 
         .search-input {
@@ -292,6 +392,7 @@
             border-radius: 12px;
             color: var(--fg);
             transition: all 0.2s ease;
+            font-family: inherit;
         }
 
         .search-input::placeholder {
@@ -302,6 +403,44 @@
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .view-toggles {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            color: var(--fg-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+        }
+
+        .view-btn:hover {
+            color: var(--fg);
+        }
+
+        .view-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .view-btn .material-icons {
+            font-size: 18px;
         }
 
         .loading-state {
@@ -325,16 +464,15 @@
             margin: 0;
         }
 
-        /* FIXED: Table container now allows horizontal scroll */
         .table-container {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 24px var(--shadow);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
-        /* NEW: Scrollable wrapper for the table */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -361,7 +499,6 @@
             background: var(--accent);
         }
 
-        /* Scroll hint for mobile */
         .scroll-hint {
             display: none;
             padding: 12px 16px;
@@ -405,6 +542,7 @@
             text-align: left;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         #dataTable td {
@@ -415,6 +553,7 @@
             line-height: 1.6;
             color: var(--fg);
             background: transparent;
+            transition: border-color 0.3s ease;
         }
 
         #dataTable tbody tr {
@@ -425,6 +564,10 @@
             background: rgba(16, 185, 129, 0.05);
         }
 
+        [data-theme="light"] #dataTable tbody tr:hover {
+            background: rgba(16, 185, 129, 0.08);
+        }
+
         #dataTable tbody tr:last-child td {
             border-bottom: none;
         }
@@ -432,6 +575,31 @@
         #dataTable td:first-child {
             font-weight: 600;
             color: var(--accent);
+        }
+
+        /* Favorite column */
+        .fav-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--fg-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fav-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .fav-btn.active {
+            color: #f43f5e;
+        }
+
+        .fav-btn .material-icons {
+            font-size: 22px;
         }
 
         .table-img {
@@ -466,6 +634,112 @@
             color: var(--fg);
         }
 
+        /* Card View */
+        .cards-container {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .cards-container.active {
+            display: grid;
+        }
+
+        .med-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .med-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        .card-title-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+
+        .card-fav-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--fg-muted);
+            transition: all 0.2s ease;
+        }
+
+        .card-fav-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .card-fav-btn.active {
+            color: #f43f5e;
+        }
+
+        .card-fav-btn .material-icons {
+            font-size: 24px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .card-field {
+            margin-bottom: 12px;
+        }
+
+        .card-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--fg-muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .card-field-value {
+            font-size: 14px;
+            color: var(--fg);
+            line-height: 1.5;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -500,14 +774,8 @@
         }
 
         @keyframes zoomIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .modal-close {
@@ -566,6 +834,73 @@
             font-size: 15px;
         }
 
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            body::before {
+                display: none;
+            }
+
+            .app-header {
+                position: relative;
+                background: white !important;
+                box-shadow: none;
+                border-bottom: 2px solid black;
+            }
+
+            .header-actions,
+            .tabs-wrapper,
+            .search-container,
+            .view-toggles,
+            .fav-btn,
+            .btn {
+                display: none !important;
+            }
+
+            .main-container {
+                padding: 0;
+                max-width: none;
+            }
+
+            .table-container {
+                border: 1px solid #ccc;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .scroll-hint {
+                display: none !important;
+            }
+
+            .table-wrapper {
+                overflow: visible;
+            }
+
+            #dataTable {
+                min-width: auto;
+            }
+
+            #dataTable th,
+            #dataTable td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                color: black;
+            }
+
+            #dataTable th {
+                background: #f0f0f0 !important;
+            }
+
+            .table-img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header-inner {
@@ -584,8 +919,12 @@
             }
 
             .btn {
-                padding: 8px 14px;
+                padding: 8px 12px;
                 font-size: 13px;
+            }
+
+            .btn-icon {
+                padding: 8px;
             }
 
             .tabs-wrapper {
@@ -602,8 +941,17 @@
                 padding: 16px;
             }
 
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
             .search-wrapper {
                 max-width: none;
+            }
+
+            .view-toggles {
+                justify-content: center;
             }
 
             #dataTable th,
@@ -617,9 +965,12 @@
                 height: 56px;
             }
 
-            /* Show scroll hint on mobile */
             .scroll-hint {
                 display: block;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -633,86 +984,112 @@
     </style>
 </head>
 <body>
+    <!-- Pull to refresh indicator -->
+    <div class="pull-indicator" id="pullIndicator">
+        <span class="material-icons">refresh</span>
+        <span>Release to refresh</span>
+    </div>
 
-<div class="app-header">
-    <div class="header-inner">
-        <div class="header-top">
-            <div class="title-section">
-                <div class="logo-icon">
-                    <span class="material-icons">medication</span>
+    <div class="app-header">
+        <div class="header-inner">
+            <div class="header-top">
+                <div class="title-section">
+                    <div class="logo-icon">
+                        <span class="material-icons">medication</span>
+                    </div>
+                    <div class="title-block">
+                        <h1 id="pageTitle">MEDICATION DATABASE</h1>
+                        <div class="page-meta">
+                            <span class="page-date" id="pageDate"></span>
+                            <span class="freshness-badge" id="freshnessBadge">Loading...</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="title-block">
-                    <h1 id="pageTitle">MEDICATION DATABASE</h1>
-                    <div class="page-date" id="pageDate"></div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-icon" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle dark/light mode">
+                        <span class="material-icons" id="themeIcon">dark_mode</span>
+                    </button>
+                    <button class="btn btn-secondary btn-icon" id="favFilterBtn" onclick="toggleFavoritesFilter()" title="Show favorites only">
+                        <span class="material-icons">favorite_border</span>
+                    </button>
+                    <button id="refreshBtn" class="btn btn-secondary" onclick="forceRefresh()">
+                        <span class="material-icons">refresh</span>
+                        <span class="btn-text">Refresh</span>
+                    </button>
+                    <a id="pdfButton" href="#" target="_blank" class="btn btn-primary" style="display: none;">
+                        <span class="material-icons">download</span>
+                        <span class="btn-text">PDF</span>
+                    </a>
                 </div>
             </div>
-            <div class="header-actions">
-                <button id="refreshBtn" class="btn btn-secondary" onclick="forceRefresh()">
-                    <span class="material-icons">refresh</span>
-                    Refresh
+            <div class="tabs-wrapper">
+                <button class="tab-btn active" data-tab="injection" onclick="switchTab('injection')">
+                    Injection
+                    <span class="badge" id="injection-count">-</span>
                 </button>
-                <a id="pdfButton" href="#" target="_blank" class="btn btn-primary" style="display: none;">
-                    <span class="material-icons">download</span>
-                    Muat Turun PDF
-                </a>
+                <button class="tab-btn" data-tab="oral" onclick="switchTab('oral')">
+                    Oral
+                    <span class="badge" id="oral-count">-</span>
+                </button>
             </div>
         </div>
-        <div class="tabs-wrapper">
-            <button class="tab-btn active" data-tab="injection" onclick="switchTab('injection')">
-                Injection
-                <span class="badge" id="injection-count">-</span>
-            </button>
-            <button class="tab-btn" data-tab="oral" onclick="switchTab('oral')">
-                Oral
-                <span class="badge" id="oral-count">-</span>
-            </button>
+    </div>
+
+    <div class="main-container">
+        <div id="pageDefinition" class="definition-box"></div>
+
+        <div class="controls-row">
+            <div class="search-wrapper">
+                <span class="material-icons">search</span>
+                <input type="text" id="customSearch" class="search-input" placeholder="Search medications...">
+            </div>
+            <div class="view-toggles">
+                <button class="view-btn active" data-view="table" onclick="switchView('table')">
+                    <span class="material-icons">table_rows</span>
+                    Table
+                </button>
+                <button class="view-btn" data-view="cards" onclick="switchView('cards')">
+                    <span class="material-icons">grid_view</span>
+                    Cards
+                </button>
+            </div>
         </div>
-    </div>
-</div>
 
-<div class="main-container">
-    <div id="pageDefinition" class="definition-box"></div>
-
-    <div class="search-container">
-        <div class="search-wrapper">
-            <span class="material-icons">search</span>
-            <input type="text" id="customSearch" class="search-input" placeholder="Search medications...">
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading medication data...</p>
         </div>
-    </div>
 
-    <div id="loadingState" class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading medication data...</p>
-    </div>
-
-    <div id="errorState" class="error-state" style="display: none;">
-        <span class="material-icons">error_outline</span>
-        <h3>Failed to Load Data</h3>
-        <p>Please check your connection and try again.</p>
-    </div>
-
-    <div class="table-container">
-        <!-- NEW: Scroll hint for mobile users -->
-        <div class="scroll-hint">
-            <span class="material-icons">swipe</span>
-            Scroll left/right to see more columns
+        <div id="errorState" class="error-state" style="display: none;">
+            <span class="material-icons">error_outline</span>
+            <h3>Failed to Load Data</h3>
+            <p>Please check your connection and try again.</p>
         </div>
-        <!-- NEW: Wrapper for horizontal scrolling -->
-        <div class="table-wrapper">
-            <table id="dataTable">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
-<div id="imgModal" class="modal" onclick="closeModal()">
-    <button class="modal-close">
-        <span class="material-icons">close</span>
-    </button>
-    <img class="modal-content" id="modalImg">
-</div>
+        <!-- Table View -->
+        <div id="tableContainer" class="table-container">
+            <div class="scroll-hint">
+                <span class="material-icons">swipe</span>
+                Scroll left/right to see more columns
+            </div>
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card View -->
+        <div id="cardsContainer" class="cards-container"></div>
+    </div>
+
+    <div id="imgModal" class="modal" onclick="closeModal()">
+        <button class="modal-close" aria-label="Close modal">
+            <span class="material-icons">close</span>
+        </button>
+        <img class="modal-content" id="modalImg" alt="Medication image enlarged">
+    </div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -724,34 +1101,135 @@
     const SHEET_ID = '1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ';
     
     const TABS_CONFIG = {
-        injection: {
-            gid: '0',
-            name: 'Injection'
-        },
-        oral: {
-            gid: '1948005281',
-            name: 'Oral'
-        }
+        injection: { gid: '0', name: 'Injection' },
+        oral: { gid: '1948005281', name: 'Oral' }
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v11_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v12_';
+    const FAVORITES_KEY = 'medApp_favorites';
+    const THEME_KEY = 'medApp_theme';
     
     // State
     let currentTab = 'injection';
+    let currentView = 'table';
     let dataTableInstance = null;
-    let allData = {
-        injection: null,
-        oral: null
-    };
+    let allData = { injection: null, oral: null };
+    let favorites = new Set();
+    let showFavoritesOnly = false;
+    let lastRefreshTime = null;
+
+    // =============================================
+    // INITIALIZATION
+    // =============================================
+    
+    function init() {
+        loadTheme();
+        loadFavorites();
+        loadAllData();
+        setupPullToRefresh();
+        setupSearch();
+        setupAutoRefresh();
+    }
+
+    // =============================================
+    // THEME
+    // =============================================
+    
+    function loadTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('themeIcon').textContent = 'light_mode';
+        }
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const newTheme = current === 'light' ? 'dark' : 'light';
+        
+        if (newTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('themeIcon').textContent = 'light_mode';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.getElementById('themeIcon').textContent = 'dark_mode';
+        }
+        
+        localStorage.setItem(THEME_KEY, newTheme);
+    }
+
+    // =============================================
+    // FAVORITES
+    // =============================================
+    
+    function loadFavorites() {
+        try {
+            const saved = localStorage.getItem(FAVORITES_KEY);
+            if (saved) {
+                favorites = new Set(JSON.parse(saved));
+            }
+        } catch (e) {
+            favorites = new Set();
+        }
+    }
+
+    function saveFavorites() {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+    }
+
+    function toggleFavorite(medName) {
+        if (favorites.has(medName)) {
+            favorites.delete(medName);
+        } else {
+            favorites.add(medName);
+        }
+        saveFavorites();
+        updateFavoriteButtons();
+        
+        if (showFavoritesOnly) {
+            renderTable(currentTab);
+            renderCards(currentTab);
+        }
+    }
+
+    function toggleFavoritesFilter() {
+        showFavoritesOnly = !showFavoritesOnly;
+        const btn = document.getElementById('favFilterBtn');
+        
+        if (showFavoritesOnly) {
+            btn.classList.add('active');
+            btn.querySelector('.material-icons').textContent = 'favorite';
+        } else {
+            btn.classList.remove('active');
+            btn.querySelector('.material-icons').textContent = 'favorite_border';
+        }
+        
+        renderTable(currentTab);
+        renderCards(currentTab);
+    }
+
+    function updateFavoriteButtons() {
+        document.querySelectorAll('.fav-btn, .card-fav-btn').forEach(btn => {
+            const name = btn.dataset.name;
+            if (favorites.has(name)) {
+                btn.classList.add('active');
+                const icon = btn.querySelector('.material-icons');
+                if (icon) icon.textContent = 'favorite';
+            } else {
+                btn.classList.remove('active');
+                const icon = btn.querySelector('.material-icons');
+                if (icon) icon.textContent = 'favorite_border';
+            }
+        });
+    }
 
     // =============================================
     // UTILITY FUNCTIONS
     // =============================================
     
     function getCsvUrl(gid) {
-        const timestamp = new Date().getTime();
-        return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}&t=${timestamp}`;
+        return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
     }
 
     function getImageUrl(rawUrl) {
@@ -807,6 +1285,35 @@
         return result;
     }
 
+    function updateFreshness() {
+        const badge = document.getElementById('freshnessBadge');
+        
+        if (!lastRefreshTime) {
+            badge.textContent = 'No data';
+            badge.classList.remove('fresh');
+            return;
+        }
+        
+        const now = Date.now();
+        const diff = now - lastRefreshTime;
+        const mins = Math.floor(diff / 60000);
+        
+        let text = '';
+        if (mins < 1) {
+            text = 'Just now';
+            badge.classList.add('fresh');
+        } else if (mins < 60) {
+            text = `${mins}m ago`;
+            badge.classList.add('fresh');
+        } else {
+            const hours = Math.floor(mins / 60);
+            text = `${hours}h ago`;
+            badge.classList.remove('fresh');
+        }
+        
+        badge.textContent = text;
+    }
+
     // =============================================
     // DATA FETCHING
     // =============================================
@@ -814,7 +1321,7 @@
     async function fetchTabData(tabKey, force = false) {
         const config = TABS_CONFIG[tabKey];
         const cacheKey = CACHE_KEY_PREFIX + tabKey;
-        const now = new Date().getTime();
+        const now = Date.now();
         
         if (!force) {
             const cachedRaw = localStorage.getItem(cacheKey);
@@ -830,44 +1337,33 @@
             }
         }
 
-        try {
-            const url = getCsvUrl(config.gid);
-            const response = await fetch(url);
-            
-            if (!response.ok) throw new Error('Network response not ok');
-            
-            const csvText = await response.text();
-            const result = Papa.parse(csvText, { 
-                header: true, 
-                skipEmptyLines: true 
-            });
-            
-            const data = result.data;
-            
-            localStorage.setItem(cacheKey, JSON.stringify({
-                timestamp: now,
-                data: data
-            }));
-            
-            return data;
-        } catch (error) {
-            console.error(`Error fetching ${tabKey}:`, error);
-            
-            const cachedRaw = localStorage.getItem(cacheKey);
-            if (cachedRaw) {
-                try {
-                    return JSON.parse(cachedRaw).data;
-                } catch (e) {}
-            }
-            
-            throw error;
-        }
+        const url = getCsvUrl(config.gid);
+        const response = await fetch(url);
+        
+        if (!response.ok) throw new Error('Network response not ok');
+        
+        const csvText = await response.text();
+        const result = Papa.parse(csvText, { 
+            header: true, 
+            skipEmptyLines: true 
+        });
+        
+        const data = result.data;
+        
+        localStorage.setItem(cacheKey, JSON.stringify({
+            timestamp: now,
+            data: data
+        }));
+        
+        return data;
     }
 
     async function loadAllData(forceRefresh = false) {
         const refreshBtn = document.getElementById('refreshBtn');
         const loadingState = document.getElementById('loadingState');
         const errorState = document.getElementById('errorState');
+        const tableContainer = document.getElementById('tableContainer');
+        const cardsContainer = document.getElementById('cardsContainer');
         
         if (forceRefresh) {
             refreshBtn.classList.add('spin');
@@ -875,6 +1371,8 @@
         
         loadingState.style.display = 'block';
         errorState.style.display = 'none';
+        tableContainer.style.display = 'none';
+        cardsContainer.style.display = 'none';
 
         try {
             const [injectionData, oralData] = await Promise.all([
@@ -884,15 +1382,22 @@
 
             allData.injection = injectionData;
             allData.oral = oralData;
+            lastRefreshTime = Date.now();
 
-            document.getElementById('injection-count').textContent = 
-                injectionData ? injectionData.length : '0';
-            document.getElementById('oral-count').textContent = 
-                oralData ? oralData.length : '0';
+            document.getElementById('injection-count').textContent = injectionData ? injectionData.length : '0';
+            document.getElementById('oral-count').textContent = oralData ? oralData.length : '0';
 
             loadingState.style.display = 'none';
             
-            renderTable(currentTab);
+            if (currentView === 'table') {
+                tableContainer.style.display = 'block';
+                renderTable(currentTab);
+            } else {
+                cardsContainer.classList.add('active');
+                renderCards(currentTab);
+            }
+            
+            updateFreshness();
 
         } catch (error) {
             console.error('Load error:', error);
@@ -908,15 +1413,26 @@
     // =============================================
     
     function renderTable(tabKey) {
-        const data = allData[tabKey];
+        let data = allData[tabKey];
         
-        if (!data || data.length === 0) {
-            console.warn('No data for tab:', tabKey);
+        if (!data || data.length === 0) return;
+
+        // Filter by favorites if needed
+        if (showFavoritesOnly) {
+            const nameCol = Object.keys(data[0]).find(k => !CONFIG_COLUMNS.includes(k));
+            data = data.filter(row => favorites.has(row[nameCol]));
+        }
+
+        if (data.length === 0) {
+            if (dataTableInstance) {
+                dataTableInstance.clear().draw();
+            }
             return;
         }
 
         const firstRow = data[0];
 
+        // Update page info
         const titleEl = document.getElementById('pageTitle');
         const dateEl = document.getElementById('pageDate');
         const definitionEl = document.getElementById('pageDefinition');
@@ -930,11 +1446,7 @@
             document.title = `${TABS_CONFIG[tabKey].name} Medications`;
         }
 
-        if (firstRow['CONFIG_DATE']) {
-            dateEl.textContent = firstRow['CONFIG_DATE'];
-        } else {
-            dateEl.textContent = '';
-        }
+        dateEl.textContent = firstRow['CONFIG_DATE'] || '';
 
         if (firstRow['CONFIG_DEFINITION']) {
             definitionEl.innerHTML = `<p>${parseBoldText(firstRow['CONFIG_DEFINITION'])}</p>`;
@@ -955,43 +1467,62 @@
             pdfBtn.style.display = 'none';
         }
 
+        // Get table headers
         const allHeaders = Object.keys(firstRow);
         const tableHeaders = allHeaders.filter(h => !CONFIG_COLUMNS.includes(h));
 
+        // Destroy existing table
         if (dataTableInstance) {
             dataTableInstance.clear().destroy();
             $('#dataTable').empty();
         }
 
-        let tableHtml = '<thead><tr>';
+        // Build table HTML
+        let tableHtml = '<thead><tr><th></th>'; // Empty header for favorites column
         tableHeaders.forEach(h => {
             tableHtml += `<th>${h}</th>`;
         });
         tableHtml += '</tr></thead><tbody></tbody>';
         $('#dataTable').html(tableHtml);
 
-        const columnsConfig = tableHeaders.map(key => {
-            return {
-                data: key,
+        // Column config
+        const columnsConfig = [
+            {
+                data: null,
+                orderable: false,
                 render: function(data, type, row) {
-                    if (!data) return '';
-                    
-                    const rawVal = data.toString();
-                    
-                    const imgUrl = getImageUrl(rawVal);
-                    if (imgUrl) {
-                        return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'img-error\\'>Image Error</span>'" alt="Medication Image">`;
-                    }
-                    
-                    if (rawVal.toLowerCase() === 'no image') {
-                        return '<span class="no-image">No Image</span>';
-                    }
-                    
-                    return parseBoldText(rawVal);
+                    const nameCol = tableHeaders[0];
+                    const name = row[nameCol];
+                    const isFav = favorites.has(name);
+                    return `<button class="fav-btn ${isFav ? 'active' : ''}" data-name="${name.replace(/"/g, '&quot;')}" onclick="toggleFavorite('${name.replace(/'/g, "\\'")}')">
+                        <span class="material-icons">${isFav ? 'favorite' : 'favorite_border'}</span>
+                    </button>`;
                 }
-            };
-        });
+            },
+            ...tableHeaders.map(key => {
+                return {
+                    data: key,
+                    render: function(data, type, row) {
+                        if (!data) return '';
+                        
+                        const rawVal = data.toString();
+                        
+                        const imgUrl = getImageUrl(rawVal);
+                        if (imgUrl) {
+                            return `<img src="${imgUrl}" class="table-img" onclick="zoomImage('${imgUrl}')" onerror="this.outerHTML='<span class=\\'img-error\\'>Image Error</span>'" alt="Medication">`;
+                        }
+                        
+                        if (rawVal.toLowerCase() === 'no image') {
+                            return '<span class="no-image">No Image</span>';
+                        }
+                        
+                        return parseBoldText(rawVal);
+                    }
+                };
+            })
+        ];
 
+        // Initialize DataTable
         dataTableInstance = $('#dataTable').DataTable({
             data: data,
             columns: columnsConfig,
@@ -1002,7 +1533,7 @@
             searching: true,
             order: [],
             language: {
-                emptyTable: 'No medications found',
+                emptyTable: showFavoritesOnly ? 'No favorites yet. Click the heart icon to add some!' : 'No medications found',
                 zeroRecords: 'No matching medications found'
             },
             initComplete: function() {
@@ -1012,6 +1543,125 @@
                 }
             }
         });
+    }
+
+    // =============================================
+    // CARD VIEW
+    // =============================================
+    
+    function renderCards(tabKey) {
+        let data = allData[tabKey];
+        const container = document.getElementById('cardsContainer');
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p style="color: var(--fg-muted); text-align: center; padding: 40px;">No data available</p>';
+            return;
+        }
+
+        const firstRow = data[0];
+        const allHeaders = Object.keys(firstRow);
+        const tableHeaders = allHeaders.filter(h => !CONFIG_COLUMNS.includes(h));
+        
+        // Filter by favorites if needed
+        if (showFavoritesOnly) {
+            const nameCol = tableHeaders[0];
+            data = data.filter(row => favorites.has(row[nameCol]));
+        }
+
+        if (data.length === 0) {
+            container.innerHTML = '<p style="color: var(--fg-muted); text-align: center; padding: 40px;">No favorites yet. Click the heart icon to add some!</p>';
+            return;
+        }
+
+        // Filter by search
+        const searchTerm = $('#customSearch').val().toLowerCase();
+        if (searchTerm) {
+            data = data.filter(row => {
+                return tableHeaders.some(h => {
+                    const val = row[h];
+                    return val && val.toString().toLowerCase().includes(searchTerm);
+                });
+            });
+        }
+
+        let html = '';
+        data.forEach(row => {
+            const nameCol = tableHeaders[0];
+            const name = row[nameCol] || 'Unknown';
+            const isFav = favorites.has(name);
+            
+            // Find image
+            let imgUrl = null;
+            let imgCol = null;
+            for (const h of tableHeaders) {
+                const val = row[h];
+                if (val) {
+                    const url = getImageUrl(val.toString());
+                    if (url) {
+                        imgUrl = url;
+                        imgCol = h;
+                        break;
+                    }
+                }
+            }
+
+            html += `<div class="med-card">
+                <div class="card-header">
+                    ${imgUrl ? `<img src="${imgUrl}" class="card-img" onclick="zoomImage('${imgUrl}')" alt="${name}">` : `<div class="card-img" style="display: flex; align-items: center; justify-content: center; color: var(--fg-muted);">No image</div>`}
+                    <div class="card-title-section">
+                        <h3 class="card-title">${parseBoldText(name)}</h3>
+                    </div>
+                    <button class="card-fav-btn ${isFav ? 'active' : ''}" data-name="${name.replace(/"/g, '&quot;')}" onclick="toggleFavorite('${name.replace(/'/g, "\\'")}')">
+                        <span class="material-icons">${isFav ? 'favorite' : 'favorite_border'}</span>
+                    </button>
+                </div>
+                <div class="card-body">`;
+
+            tableHeaders.forEach(h => {
+                if (h === nameCol || h === imgCol) return;
+                
+                let val = row[h];
+                if (!val) return;
+                
+                const valStr = val.toString();
+                if (valStr.toLowerCase() === 'no image') return;
+                if (getImageUrl(valStr)) return;
+                
+                html += `<div class="card-field">
+                    <div class="card-field-label">${h}</div>
+                    <div class="card-field-value">${parseBoldText(valStr)}</div>
+                </div>`;
+            });
+
+            html += `</div></div>`;
+        });
+
+        container.innerHTML = html || '<p style="color: var(--fg-muted); text-align: center; padding: 40px;">No matching medications found</p>';
+    }
+
+    // =============================================
+    // VIEW SWITCHING
+    // =============================================
+    
+    function switchView(view) {
+        currentView = view;
+        
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+
+        const tableContainer = document.getElementById('tableContainer');
+        const cardsContainer = document.getElementById('cardsContainer');
+
+        if (view === 'table') {
+            tableContainer.style.display = 'block';
+            cardsContainer.classList.remove('active');
+            renderTable(currentTab);
+        } else {
+            tableContainer.style.display = 'none';
+            cardsContainer.classList.add('active');
+            renderCards(currentTab);
+        }
     }
 
     // =============================================
@@ -1027,10 +1677,10 @@
 
         currentTab = tabKey;
 
-        if (allData[tabKey]) {
+        if (currentView === 'table') {
             renderTable(tabKey);
         } else {
-            loadAllData();
+            renderCards(tabKey);
         }
     }
 
@@ -1039,9 +1689,9 @@
     // =============================================
     
     function forceRefresh() {
-        const cacheKey = CACHE_KEY_PREFIX + currentTab;
-        localStorage.removeItem(cacheKey);
-        
+        Object.keys(TABS_CONFIG).forEach(key => {
+            localStorage.removeItem(CACHE_KEY_PREFIX + key);
+        });
         loadAllData(true);
     }
 
@@ -1053,10 +1703,78 @@
     }
 
     function closeModal() {
-        const modal = document.getElementById('imgModal');
-        modal.classList.remove('active');
+        document.getElementById('imgModal').classList.remove('active');
     }
 
+    // =============================================
+    // PULL TO REFRESH (Mobile)
+    // =============================================
+    
+    function setupPullToRefresh() {
+        let startY = 0;
+        let pulling = false;
+        const indicator = document.getElementById('pullIndicator');
+
+        document.addEventListener('touchstart', function(e) {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].pageY;
+                pulling = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!pulling) return;
+            
+            const currentY = e.touches[0].pageY;
+            const diff = currentY - startY;
+            
+            if (diff > 80 && window.scrollY === 0) {
+                indicator.classList.add('visible');
+            } else {
+                indicator.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', function() {
+            if (indicator.classList.contains('visible')) {
+                forceRefresh();
+            }
+            indicator.classList.remove('visible');
+            pulling = false;
+        }, { passive: true });
+    }
+
+    // =============================================
+    // SEARCH
+    // =============================================
+    
+    function setupSearch() {
+        $('#customSearch').on('keyup clear', function() {
+            const term = $(this).val();
+            
+            if (currentView === 'table' && dataTableInstance) {
+                dataTableInstance.search(term).draw();
+            } else if (currentView === 'cards') {
+                renderCards(currentTab);
+            }
+        });
+    }
+
+    // =============================================
+    // AUTO REFRESH
+    // =============================================
+    
+    function setupAutoRefresh() {
+        // Update freshness every minute
+        setInterval(updateFreshness, 60000);
+        
+        // Auto-refresh data every 5 minutes
+        setInterval(() => {
+            loadAllData(false);
+        }, 300000);
+    }
+
+    // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
@@ -1064,22 +1782,10 @@
     });
 
     // =============================================
-    // INITIALIZATION
+    // START
     // =============================================
     
-    $(document).ready(function() {
-        loadAllData();
-
-        $('#customSearch').on('keyup clear', function() {
-            if (dataTableInstance) {
-                dataTableInstance.search($(this).val()).draw();
-            }
-        });
-
-        setInterval(() => {
-            loadAllData(false);
-        }, 300000);
-    });
+    $(document).ready(init);
 </script>
 
 </body>
