@@ -6,11 +6,16 @@
     <meta name="theme-color" content="#0a0f1c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Meds DB">
+    <meta name="description" content="Medication Database - Browse injection, oral, IV-to-oral, and cough & cold medications">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2310b981' width='100' height='100' rx='20'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>M</text></svg>">
     <title>Medication Database</title>
+    
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
     <style>
         /* Base font normalization */
         html {
@@ -31,6 +36,8 @@
             --accent-glow: rgba(16, 185, 129, 0.3);
             --danger: #ef4444;
             --danger-glow: rgba(239, 68, 68, 0.2);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.2);
             --border: #2d3a4f;
             --header-bg: #0f172a;
             --shadow: rgba(0, 0, 0, 0.2);
@@ -93,6 +100,100 @@
                 radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
         }
 
+        /* Offline Banner */
+        .offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+            padding: 0.625rem 1rem;
+            font-size: var(--text-sm);
+            font-weight: 600;
+            text-align: center;
+            z-index: 1001;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
+        }
+
+        .offline-banner.visible {
+            transform: translateY(0);
+        }
+
+        .offline-banner .material-icons {
+            font-size: 1.125rem;
+        }
+
+        body.offline .app-header {
+            margin-top: 2.25rem;
+        }
+
+        /* Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 0.5rem 2rem var(--shadow);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: calc(100% - 2rem);
+        }
+
+        .install-prompt.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .install-prompt-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .install-prompt-icon .material-icons {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .install-prompt-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .install-prompt-title {
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin-bottom: 0.25rem;
+        }
+
+        .install-prompt-desc {
+            font-size: var(--text-xs);
+            color: var(--fg-muted);
+        }
+
+        .install-prompt-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .pull-indicator {
             position: fixed;
             top: 0;
@@ -126,7 +227,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            transition: background 0.3s ease, border-color 0.3s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, margin-top 0.3s ease;
         }
 
         [data-theme="light"] .app-header {
@@ -208,6 +309,12 @@
             background: rgba(16, 185, 129, 0.1);
             color: var(--accent);
             border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .freshness-badge.cached {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.3);
         }
 
         .header-actions {
@@ -854,6 +961,7 @@
                 color: black !important;
             }
             body::before { display: none; }
+            .offline-banner, .install-prompt { display: none !important; }
             .app-header {
                 position: relative;
                 background: white !important;
@@ -953,6 +1061,17 @@
             .cards-container {
                 grid-template-columns: 1fr;
             }
+
+            .install-prompt {
+                left: 1rem;
+                right: 1rem;
+                transform: translateX(0) translateY(150%);
+                width: auto;
+            }
+
+            .install-prompt.visible {
+                transform: translateX(0) translateY(0);
+            }
         }
 
         /* Small phones */
@@ -1001,6 +1120,27 @@
     </style>
 </head>
 <body>
+    <!-- Offline Banner -->
+    <div class="offline-banner" id="offlineBanner">
+        <span class="material-icons">wifi_off</span>
+        <span>You're offline - showing cached data</span>
+    </div>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-prompt-icon">
+            <span class="material-icons">download</span>
+        </div>
+        <div class="install-prompt-content">
+            <div class="install-prompt-title">Install App</div>
+            <div class="install-prompt-desc">Add to home screen for offline access</div>
+        </div>
+        <div class="install-prompt-actions">
+            <button class="btn btn-secondary" onclick="dismissInstall()">Later</button>
+            <button class="btn btn-primary" onclick="installApp()">Install</button>
+        </div>
+    </div>
+
     <div class="pull-indicator" id="pullIndicator">
         <span class="material-icons">refresh</span>
         <span>Release to refresh</span>
@@ -1117,6 +1257,207 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
+    // =============================================
+    // SERVICE WORKER & PWA SETUP
+    // =============================================
+    
+    const CACHE_VERSION = 'med-app-v1';
+    const STATIC_ASSETS = [
+        'https://code.jquery.com/jquery-3.7.0.min.js',
+        'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js',
+        'https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css',
+        'https://fonts.googleapis.com/icon?family=Material+Icons',
+        'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
+        'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js'
+    ];
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+            try {
+                // Create service worker blob
+                const swCode = `
+                    const CACHE_VERSION = '${CACHE_VERSION}';
+                    const STATIC_ASSETS = ${JSON.stringify(STATIC_ASSETS)};
+                    
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_VERSION).then((cache) => {
+                                return cache.addAll(STATIC_ASSETS);
+                            })
+                        );
+                        self.skipWaiting();
+                    });
+                    
+                    self.addEventListener('activate', (event) => {
+                        event.waitUntil(
+                            caches.keys().then((keys) => {
+                                return Promise.all(
+                                    keys.filter(key => key !== CACHE_VERSION)
+                                        .map(key => caches.delete(key))
+                                );
+                            })
+                        );
+                        self.clients.claim();
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        const url = new URL(event.request.url);
+                        
+                        // Skip non-GET requests
+                        if (event.request.method !== 'GET') return;
+                        
+                        // Handle Google Sheets CSV requests
+                        if (url.hostname === 'docs.google.com' && url.pathname.includes('/export')) {
+                            event.respondWith(
+                                fetch(event.request)
+                                    .then(response => {
+                                        const responseClone = response.clone();
+                                        caches.open(CACHE_VERSION).then(cache => {
+                                            cache.put(event.request, responseClone);
+                                        });
+                                        return response;
+                                    })
+                                    .catch(() => {
+                                        return caches.match(event.request);
+                                    })
+                            );
+                            return;
+                        }
+                        
+                        // Handle Google Drive images
+                        if (url.hostname === 'drive.google.com' && url.pathname.includes('/thumbnail')) {
+                            event.respondWith(
+                                caches.match(event.request).then(cached => {
+                                    if (cached) return cached;
+                                    return fetch(event.request).then(response => {
+                                        const responseClone = response.clone();
+                                        caches.open(CACHE_VERSION).then(cache => {
+                                            cache.put(event.request, responseClone);
+                                        });
+                                        return response;
+                                    });
+                                })
+                            );
+                            return;
+                        }
+                        
+                        // Standard cache-first for static assets
+                        event.respondWith(
+                            caches.match(event.request).then(cached => {
+                                if (cached) return cached;
+                                return fetch(event.request).then(response => {
+                                    if (response.status === 200) {
+                                        const responseClone = response.clone();
+                                        caches.open(CACHE_VERSION).then(cache => {
+                                            cache.put(event.request, responseClone);
+                                        });
+                                    }
+                                    return response;
+                                });
+                            })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                await navigator.serviceWorker.register(swUrl);
+                console.log('Service Worker registered');
+            } catch (err) {
+                console.log('Service Worker registration failed:', err);
+            }
+        });
+    }
+
+    // Create and inject Web App Manifest
+    const manifest = {
+        name: 'Medication Database',
+        short_name: 'Meds DB',
+        description: 'Medication Database - Browse injection, oral, IV-to-oral, and cough & cold medications',
+        start_url: '.',
+        display: 'standalone',
+        background_color: '#0a0f1c',
+        theme_color: '#10b981',
+        orientation: 'portrait-primary',
+        icons: [
+            {
+                src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect fill="%2310b981" width="512" height="512" rx="100"/><text x="256" y="340" font-size="280" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">M</text></svg>',
+                sizes: '512x512',
+                type: 'image/svg+xml',
+                purpose: 'any maskable'
+            }
+        ],
+        categories: ['medical', 'health', 'reference']
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = manifestUrl;
+    document.head.appendChild(manifestLink);
+
+    // PWA Install handling
+    let deferredPrompt = null;
+    let installDismissed = localStorage.getItem('installDismissed');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        if (!installDismissed) {
+            setTimeout(() => {
+                document.getElementById('installPrompt').classList.add('visible');
+            }, 3000);
+        }
+    });
+
+    function installApp() {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+            deferredPrompt = null;
+            document.getElementById('installPrompt').classList.remove('visible');
+        });
+    }
+
+    function dismissInstall() {
+        document.getElementById('installPrompt').classList.remove('visible');
+        localStorage.setItem('installDismissed', 'true');
+    }
+
+    // Online/Offline detection
+    function updateOnlineStatus() {
+        const banner = document.getElementById('offlineBanner');
+        const body = document.body;
+        
+        if (!navigator.onLine) {
+            banner.classList.add('visible');
+            body.classList.add('offline');
+        } else {
+            banner.classList.remove('visible');
+            body.classList.remove('offline');
+        }
+    }
+
+    window.addEventListener('online', () => {
+        updateOnlineStatus();
+        // Try to refresh data when coming back online
+        loadAllData(false);
+    });
+
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    // Check initial status
+    updateOnlineStatus();
+
+    // =============================================
+    // APP LOGIC
+    // =============================================
+    
     const SHEET_ID = '1pSOW0oQ2J09Oq_q2O1d8nOnWwzUQ_daoSUixHxI9xYQ';
     
     const TABS_CONFIG = {
@@ -1127,7 +1468,7 @@
     };
 
     const CONFIG_COLUMNS = ['CONFIG_TITLE', 'CONFIG_PDF', 'CONFIG_DATE', 'CONFIG_DEFINITION'];
-    const CACHE_KEY_PREFIX = 'medAppCache_v17_';
+    const CACHE_KEY_PREFIX = 'medAppCache_v18_';
     const FAVORITES_KEY = 'medApp_favorites';
     const THEME_KEY = 'medApp_theme';
     
@@ -1138,6 +1479,7 @@
     let favorites = new Set();
     let showFavoritesOnly = false;
     let lastRefreshTime = null;
+    let isFromCache = false;
 
     function init() {
         loadTheme();
@@ -1278,24 +1620,22 @@
                        .replace(/&lt;br\s*\/?&gt;/gi, '<br>');
 
         // 3. Parse Line Breaks from Sheets (\n -> <br>)
-        // Sheets exports newlines as \n within the CSV text
         result = result.replace(/\n/g, '<br>');
 
-        // 4. Parse Alignment Tags: [center]...[/center], [right]...[/right], [left]...[/left]
-        // We wrap content in a div with alignment class
+        // 4. Parse Alignment Tags
         result = result.replace(/\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi, function(match, align, content) {
             return `<div class="rt-align-${align.toLowerCase()}">${content}</div>`;
         });
 
-        // 5. Parse Color Tags: [color=red]...[/color] or [color=#ff0000]...[/color]
+        // 5. Parse Color Tags
         result = result.replace(/\[color=([a-zA-Z]+|#[0-9a-fA-F]{3,6})\]([\s\S]*?)\[\/color\]/gi, function(match, color, content) {
             return `<span style="color: ${color};">${content}</span>`;
         });
 
-        // 6. Parse Markdown-style Bold: **text** -> <b>text</b>
+        // 6. Parse Markdown-style Bold
         result = result.replace(/\*\*([^*]+)\*\*/g, '<b class="bold-text">$1</b>');
         
-        // 7. Parse Markdown-style Italic: *text* -> <em>text</em>
+        // 7. Parse Markdown-style Italic
         result = result.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
         return result;
@@ -1305,19 +1645,29 @@
         const badge = document.getElementById('freshnessBadge');
         if (!lastRefreshTime) {
             badge.textContent = 'No data';
-            badge.classList.remove('fresh');
+            badge.classList.remove('fresh', 'cached');
             return;
         }
+        
         const mins = Math.floor((Date.now() - lastRefreshTime) / 60000);
-        if (mins < 1) {
-            badge.textContent = 'Just now';
-            badge.classList.add('fresh');
-        } else if (mins < 60) {
-            badge.textContent = `${mins}m ago`;
-            badge.classList.add('fresh');
-        } else {
-            badge.textContent = `${Math.floor(mins / 60)}h ago`;
+        
+        if (isFromCache) {
+            badge.textContent = mins < 1 ? 'Cached' : `Cached ${mins}m ago`;
             badge.classList.remove('fresh');
+            badge.classList.add('cached');
+        } else {
+            if (mins < 1) {
+                badge.textContent = 'Just now';
+                badge.classList.add('fresh');
+                badge.classList.remove('cached');
+            } else if (mins < 60) {
+                badge.textContent = `${mins}m ago`;
+                badge.classList.add('fresh');
+                badge.classList.remove('cached');
+            } else {
+                badge.textContent = `${Math.floor(mins / 60)}h ago`;
+                badge.classList.remove('fresh', 'cached');
+            }
         }
     }
 
@@ -1326,16 +1676,39 @@
         const cacheKey = CACHE_KEY_PREFIX + tabKey;
         const now = Date.now();
         
-        if (!force) {
-            const cachedRaw = localStorage.getItem(cacheKey);
-            if (cachedRaw) {
-                try {
-                    const cached = JSON.parse(cachedRaw);
-                    if (cached.timestamp && (now - cached.timestamp < 300000)) {
+        // Try cache first (always, for offline support)
+        const cachedRaw = localStorage.getItem(cacheKey);
+        if (cachedRaw) {
+            try {
+                const cached = JSON.parse(cachedRaw);
+                if (cached.timestamp && cached.data) {
+                    // Use cache if: force refresh not requested, OR we're offline
+                    if (!force || !navigator.onLine) {
+                        if (!force && (now - cached.timestamp < 300000)) {
+                            // Fresh cache (< 5 min)
+                            isFromCache = false;
+                            return cached.data;
+                        }
+                        // Stale cache but still usable
+                        isFromCache = true;
+                        lastRefreshTime = cached.timestamp;
+                        
+                        // If online, try to refresh in background
+                        if (navigator.onLine && !force) {
+                            refreshInBackground(tabKey);
+                        }
+                        
                         return cached.data;
                     }
-                } catch (e) {}
+                }
+            } catch (e) {
+                console.log('Cache parse error:', e);
             }
+        }
+
+        // No cache or force refresh - need network
+        if (!navigator.onLine) {
+            throw new Error('Offline and no cached data');
         }
 
         const response = await fetch(getCsvUrl(config.gid));
@@ -1345,7 +1718,34 @@
         const result = Papa.parse(csvText, { header: true, skipEmptyLines: true });
         
         localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, data: result.data }));
+        isFromCache = false;
         return result.data;
+    }
+
+    async function refreshInBackground(tabKey) {
+        try {
+            const config = TABS_CONFIG[tabKey];
+            const response = await fetch(getCsvUrl(config.gid));
+            if (!response.ok) return;
+            
+            const csvText = await response.text();
+            const result = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+            
+            const cacheKey = CACHE_KEY_PREFIX + tabKey;
+            localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: result.data }));
+            
+            // Update data silently
+            allData[tabKey] = result.data;
+            lastRefreshTime = Date.now();
+            isFromCache = false;
+            updateFreshness();
+            
+            // Update counts
+            const countEl = document.getElementById(`${tabKey}-count`);
+            if (countEl) countEl.textContent = result.data.length;
+        } catch (e) {
+            // Silent fail for background refresh
+        }
     }
 
     async function loadAllData(forceRefresh = false) {
@@ -1374,7 +1774,10 @@
             allData.oral = oralData;
             allData.ivToOral = ivToOralData;
             allData.coughCold = coughColdData;
-            lastRefreshTime = Date.now();
+            
+            if (!isFromCache) {
+                lastRefreshTime = Date.now();
+            }
 
             document.getElementById('injection-count').textContent = injectionData ? injectionData.length : '0';
             document.getElementById('oral-count').textContent = oralData ? oralData.length : '0';
@@ -1396,7 +1799,42 @@
         } catch (error) {
             console.error('Load error:', error);
             loadingState.style.display = 'none';
-            errorState.style.display = 'block';
+            
+            // Check if we have any cached data to show
+            const hasAnyCache = Object.keys(TABS_CONFIG).some(key => {
+                const cached = localStorage.getItem(CACHE_KEY_PREFIX + key);
+                return cached !== null;
+            });
+            
+            if (hasAnyCache) {
+                errorState.innerHTML = `
+                    <span class="material-icons">cloud_off</span>
+                    <h3>Using Cached Data</h3>
+                    <p>You're offline. Showing last saved data.</p>
+                    <button class="btn btn-primary" onclick="loadAllData(false)" style="margin-top: 1rem;">
+                        <span class="material-icons">refresh</span>
+                        Try Again
+                    </button>
+                `;
+                
+                // Load cached data anyway
+                Object.keys(TABS_CONFIG).forEach(key => {
+                    const cached = localStorage.getItem(CACHE_KEY_PREFIX + key);
+                    if (cached) {
+                        try {
+                            allData[key] = JSON.parse(cached).data;
+                            isFromCache = true;
+                        } catch (e) {}
+                    }
+                });
+                
+                lastRefreshTime = Date.now();
+                tableContainer.style.display = 'block';
+                renderTable(currentTab);
+                updateFreshness();
+            } else {
+                errorState.style.display = 'block';
+            }
         } finally {
             refreshBtn.classList.remove('spin');
         }
@@ -1660,7 +2098,10 @@
 
     function setupAutoRefresh() {
         setInterval(updateFreshness, 60000);
-        setInterval(() => loadAllData(false), 300000);
+        // Only auto-refresh if online
+        setInterval(() => {
+            if (navigator.onLine) loadAllData(false);
+        }, 300000);
     }
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
